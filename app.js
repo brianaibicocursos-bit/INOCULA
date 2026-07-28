@@ -1,176 +1,134 @@
-// Configuración del tablero
-const TOTAL_TILES = 20;
-let playerPosition = 0;
-let viralLoad = 0;
-let timerInterval = null;
+// CONTROLADOR DE NAVEGACIÓN MULTI-PÁGINA
+function navigateTo(pageId) {
+  // Ocultar todas las páginas
+  document.querySelectorAll('.page-view').forEach(page => {
+    page.classList.add('hidden');
+    page.classList.remove('active');
+  });
 
-// Tipos de casillas según propuesta INOCULA
-const tileTypes = ["inicio", "reto", "virus", "herramienta", "cadena_rota"];
+  // Mostrar página seleccionada
+  const targetPage = document.getElementById(pageId);
+  targetPage.classList.remove('hidden');
+  targetPage.classList.add('active');
 
-// Banco de Retos y Pistas Falsas
-const challenges = [
-  {
-    titulo: "🔍 Pista Falsa / Reto: Noticia Viral",
-    desc: "Un titular afirma: 'Descubren que las imágenes de satélite muestran una estructura alienígena en el Polo Sur'. ¿Qué haces?",
-    opciones: [
-      { texto: "Verificar fuente y hacer búsqueda inversa", correcta: true },
-      { texto: "Compartir inmediatamente en WhatsApp", correcta: false }
-    ],
-    explicacion: "¡Bien hecho! Aplicaste criterio antes de compartir."
-  },
-  {
-    titulo: "🤖 Pista Falsa / Reto: Imagen IA",
-    desc: "Ves una foto de una personalidad pública arrestada. La mano tiene 6 dedos y el fondo se ve distorsionado. ¿Es real?",
-    opciones: [
-      { texto: "Es una imagen generada por IA (Falsa)", correcta: true },
-      { texto: "Es real y reciente", correcta: false }
-    ],
-    explicacion: "¡Exacto! Las deformaciones en manos son señales comunes de IA."
-  }
+  // Actualizar estados de botones nav
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+// LÓGICA DE JUEGO & TABLERO
+const BOARD_SIZE = 15;
+let currentPosition = 0;
+let viralLoad = 25;
+let playerProfile = "Ciber-Detective";
+
+const tileTypes = [
+  { type: 'reto', label: 'Pista Falsa', icon: 'fa-triangle-exclamation', color: '#f59e0b' },
+  { type: 'virus', label: 'Viralización', icon: 'fa-virus', color: '#f43f5e' },
+  { type: 'herramienta', label: 'Fact-Check', icon: 'fa-screwdriver-wrench', color: '#6366f1' },
+  { type: 'cadena', label: 'Cadena Rota', icon: 'fa-link-slash', color: '#10b981' }
 ];
 
-// Asignación de mapa de casillas
-const boardData = [];
-for (let i = 0; i < TOTAL_TILES; i++) {
-  if (i === 0) boardData.push({ id: i, type: "inicio", label: "Inicio" });
-  else {
-    const types = ["reto", "virus", "herramienta", "cadena_rota"];
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    boardData.push({ id: i, type: randomType, label: getLabel(randomType) });
-  }
-}
+let boardTiles = [];
 
-function getLabel(type) {
-  switch (type) {
-    case "reto": return "🎯 Reto / Pista Falsa";
-    case "virus": return "🦠 Virus / Fake News";
-    case "herramienta": return "🛠️ Herramienta";
-    case "cadena_rota": return "🔗 Cadena Rota";
-    default: return "Inicio";
-  }
-}
+function initBoard() {
+  const container = document.getElementById('interactive-board');
+  container.innerHTML = '';
+  boardTiles = [];
 
-// Inicializar el tablero en la interfaz
-function renderBoard() {
-  const boardEl = document.getElementById("board");
-  boardEl.innerHTML = "";
-  boardData.forEach((tile, index) => {
-    const tileEl = document.createElement("div");
-    tileEl.className = `tile tile-${tile.type} ${index === playerPosition ? 'active' : ''}`;
-    tileEl.innerHTML = `
-      <span class="tile-number">#${tile.id}</span>
-      <span class="tile-type">${tile.label}</span>
-      ${index === playerPosition ? '📌' : ''}
+  for (let i = 0; i < BOARD_SIZE; i++) {
+    const randomType = tileTypes[Math.floor(Math.random() * tileTypes.length)];
+    boardTiles.push(randomType);
+
+    const tile = document.createElement('div');
+    tile.className = `game-tile ${i === 0 ? 'active' : ''}`;
+    tile.id = `tile-${i}`;
+    tile.innerHTML = `
+      <span style="font-size:0.75rem; color: #64748b;">#${i + 1}</span>
+      <i class="fa-solid ${randomType.icon} tile-icon" style="color: ${randomType.color}"></i>
+      <span style="font-size:0.8rem; font-weight:600;">${randomType.label}</span>
+      ${i === currentPosition ? '<i class="fa-solid fa-location-dot" style="color:#facc15;"></i>' : ''}
     `;
-    boardEl.appendChild(tileEl);
-  });
+    container.appendChild(tile);
+  }
 }
 
-// Tirar dado
-function rollDice() {
+function roll3DDice() {
   const roll = Math.floor(Math.random() * 6) + 1;
-  document.getElementById("dice-result").innerText = `Sacaste un: ${roll}`;
-  
-  playerPosition += roll;
-  if (playerPosition >= TOTAL_TILES) {
-    playerPosition = TOTAL_TILES - 1;
-    alert("¡Has llegado al final del recorrido digital!");
+  document.getElementById('dice-display').innerText = `🎲 ${roll}`;
+
+  // Actualizar posición
+  currentPosition += roll;
+  if (currentPosition >= BOARD_SIZE) {
+    currentPosition = BOARD_SIZE - 1;
+    alert("¡Felicidades! Completaste la simulación con éxito.");
   }
-  
-  document.getElementById("player-pos").innerText = playerPosition;
-  renderBoard();
-  handleTileEvent(boardData[playerPosition]);
+
+  initBoard(); // Re-renderizar fichas
+  triggerModal(boardTiles[currentPosition]);
 }
 
-// Manejar eventos según el tipo de casilla
-function handleTileEvent(tile) {
-  const modal = document.getElementById("modal");
-  const modalTitle = document.getElementById("modal-title");
-  const modalDesc = document.getElementById("modal-desc");
-  const modalActions = document.getElementById("modal-actions");
-  const timerBox = document.getElementById("timer-box");
+function triggerModal(tileInfo) {
+  const modal = document.getElementById('game-modal');
+  const title = document.getElementById('modal-title');
+  const desc = document.getElementById('modal-desc');
+  const actions = document.getElementById('modal-actions');
 
-  modalActions.innerHTML = "";
-  timerBox.classList.add("hidden");
-  clearInterval(timerInterval);
+  modal.classList.remove('hidden');
+  actions.innerHTML = '';
 
-  if (tile.type === "reto") {
-    const challenge = challenges[Math.floor(Math.random() * challenges.length)];
-    modalTitle.innerText = challenge.titulo;
-    modalDesc.innerText = challenge.desc;
+  if (tileInfo.type === 'reto') {
+    title.innerText = "🔍 Reto: Detección de Deepfake";
+    desc.innerText = "Se publica un audio atribuyendo declaraciones falsas a una autoridad local. ¿Cómo reaccionas?";
     
-    // Temporizador
-    timerBox.classList.remove("hidden");
-    let timeLeft = 12;
-    document.getElementById("timer-count").innerText = timeLeft;
-    
-    timerInterval = setInterval(() => {
-      timeLeft--;
-      document.getElementById("timer-count").innerText = timeLeft;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        updateViralLoad(20);
-        closeModal();
-        alert("⏰ ¡Se acabó el tiempo! El bulo se propagó +20% Carga Viral.");
-      }
-    }, 1000);
-
-    challenge.opciones.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.innerText = opt.texto;
-      btn.onclick = () => {
-        clearInterval(timerInterval);
-        if (opt.correcta) {
-          alert("¡Correcto! " + challenge.explicacion);
-        } else {
-          updateViralLoad(15);
-          alert("Incorrecto. No verificaste y el virus de la desinformación creció +15%.");
-        }
-        closeModal();
-      };
-      modalActions.appendChild(btn);
-    });
-
-  } else if (tile.type === "virus") {
-    modalTitle.innerText = "🦠 Casilla Virus / Fake News";
-    modalDesc.innerText = "Caíste en una zona con alta difusión de desinformación sin filtro. La carga viral sube un 15%.";
-    updateViralLoad(15);
-    addCloseBtn(modalActions);
-
-  } else if (tile.type === "herramienta") {
-    modalTitle.innerText = "🛠️ Casilla de Herramienta";
-    modalDesc.innerText = "¡Ganaste una técnica de verificación! Practicas 'Rastrear fuente original' y 'Revisar metadatos'.";
-    addCloseBtn(modalActions);
-
-  } else if (tile.type === "cadena_rota") {
-    modalTitle.innerText = "🔗 Casilla Cadena Rota";
-    modalDesc.innerText = "¡Excelente! Has desmentido un bulo antes de que se propague. Se reduce la carga viral en 15%.";
-    updateViralLoad(-15);
-    addCloseBtn(modalActions);
-  }
-
-  if (tile.type !== "inicio") {
-    modal.classList.remove("hidden");
+    actions.innerHTML = `
+      <button class="btn-primary" onclick="resolveChallenge(true)">Usar espectrograma e inspeccionar canal oficial</button>
+      <button class="btn-secondary" onclick="resolveChallenge(false)">Compartir en redes inmediatamente</button>
+    `;
+  } else {
+    title.innerText = `Casilla: ${tileInfo.label}`;
+    desc.innerText = `Has caído en una casilla de evento (${tileInfo.label}).`;
+    actions.innerHTML = `<button class="btn-primary" onclick="closeModal()">Continuar</button>`;
   }
 }
 
-function updateViralLoad(amount) {
+function resolveChallenge(isCorrect) {
+  if (isCorrect) {
+    alert("¡Excelente decisión! Disminuyes la desinformación.");
+    updateViral(-10);
+  } else {
+    alert("Error de verificación. La carga viral aumentó.");
+    updateViral(15);
+  }
+  closeModal();
+}
+
+function updateViral(amount) {
   viralLoad = Math.max(0, Math.min(100, viralLoad + amount));
-  document.getElementById("virus-bar").style.width = `${viralLoad}%`;
-  document.getElementById("virus-status").innerText = `${viralLoad}% - Carga Viral`;
-}
-
-function addCloseBtn(container) {
-  const btn = document.createElement("button");
-  btn.innerText = "Continuar";
-  btn.onclick = closeModal;
-  container.appendChild(btn);
+  document.getElementById('viral-fill').style.width = `${viralLoad}%`;
+  document.getElementById('viral-percentage').innerText = `${viralLoad}% Riesgo de Infodemia`;
 }
 
 function closeModal() {
-  document.getElementById("modal").classList.add("hidden");
-  clearInterval(timerInterval);
+  document.getElementById('game-modal').classList.add('hidden');
 }
 
-// Iniciar app
-renderBoard();
+function selectAvatar(element, profileName) {
+  document.querySelectorAll('.avatar-card').forEach(c => c.classList.remove('selected'));
+  element.classList.add('selected');
+  playerProfile = profileName;
+  document.getElementById('hud-user').innerText = profileName;
+}
+
+function applyLabTool(toolType) {
+  const resultBox = document.getElementById('lab-result');
+  if (toolType === 'ia') {
+    resultBox.innerText = "🤖 Análisis de IA: Se detectó patrón difuso en bordes y firmas sintéticas de modelo generativo (98% probabilidad de IA).";
+  } else if (toolType === 'meta') {
+    resultBox.innerText = "📅 Metadatos: Imagen tomada originalmente en 2018 (Fuera de contexto).";
+  } else {
+    resultBox.innerText = "🔗 Rastreo: La imagen no aparece en ninguna agencia de noticias oficial.";
+  }
+}
+
+// Inicializar al cargar
+initBoard();
