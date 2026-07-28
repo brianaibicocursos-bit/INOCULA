@@ -1,134 +1,141 @@
-// CONTROLADOR DE NAVEGACIÓN MULTI-PÁGINA
-function navigateTo(pageId) {
-  // Ocultar todas las páginas
-  document.querySelectorAll('.page-view').forEach(page => {
-    page.classList.add('hidden');
-    page.classList.remove('active');
-  });
+// CONFIGURACIÓN DEL PROYECTO INOCULA
+let currentStage = 1;
+let currentTileIndex = 0;
+let viralLoad = 15;
+let followers = 100;
+let shields = 1;
 
-  // Mostrar página seleccionada
-  const targetPage = document.getElementById(pageId);
-  targetPage.classList.remove('hidden');
-  targetPage.classList.add('active');
+// Idioma del juego y barrera del reto
+let appLanguage = 'es';
 
-  // Actualizar estados de botones nav
-  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+// Mapeo de las 4 etapas del día
+const stagesData = {
+  1: { name: 'Matutino', count: 4, type: 'clickbait' },
+  2: { name: 'Trabajo/Escuela', count: 5, type: 'dato' },
+  3: { name: 'Tarde/Redes', count: 5, type: 'deepfake' },
+  4: { name: 'Noche/Viral', count: 4, type: 'experto' }
+};
+
+// SIMULADOR DE RUEDA GIRATORIA (Life Style)
+function spinWheel() {
+  const spinBtn = document.getElementById('spin-btn');
+  spinBtn.disabled = true;
+
+  // Se genera un número del 1 al 8 y un ícono asociado
+  const moves = Math.floor(Math.random() * 6) + 1;
+  const icons = ['🤖 (Bot)', '📰 (Clickbait)', '🎭 (Deepfake)', '📊 (Dato)', '🛡️ (Herramienta)', '⚪ (Libre)'];
+  const iconResult = icons[Math.floor(Math.random() * icons.length)];
+
+  document.getElementById('wheel-display').innerHTML = `
+    <strong>Avanzas: ${moves}</strong><br><small>Encuentro: ${iconResult}</small>
+  `;
+
+  setTimeout(() => {
+    movePlayer(moves);
+    spinBtn.disabled = false;
+  }, 1000);
 }
 
-// LÓGICA DE JUEGO & TABLERO
-const BOARD_SIZE = 15;
-let currentPosition = 0;
-let viralLoad = 25;
-let playerProfile = "Ciber-Detective";
-
-const tileTypes = [
-  { type: 'reto', label: 'Pista Falsa', icon: 'fa-triangle-exclamation', color: '#f59e0b' },
-  { type: 'virus', label: 'Viralización', icon: 'fa-virus', color: '#f43f5e' },
-  { type: 'herramienta', label: 'Fact-Check', icon: 'fa-screwdriver-wrench', color: '#6366f1' },
-  { type: 'cadena', label: 'Cadena Rota', icon: 'fa-link-slash', color: '#10b981' }
-];
-
-let boardTiles = [];
-
-function initBoard() {
-  const container = document.getElementById('interactive-board');
-  container.innerHTML = '';
-  boardTiles = [];
-
-  for (let i = 0; i < BOARD_SIZE; i++) {
-    const randomType = tileTypes[Math.floor(Math.random() * tileTypes.length)];
-    boardTiles.push(randomType);
-
-    const tile = document.createElement('div');
-    tile.className = `game-tile ${i === 0 ? 'active' : ''}`;
-    tile.id = `tile-${i}`;
-    tile.innerHTML = `
-      <span style="font-size:0.75rem; color: #64748b;">#${i + 1}</span>
-      <i class="fa-solid ${randomType.icon} tile-icon" style="color: ${randomType.color}"></i>
-      <span style="font-size:0.8rem; font-weight:600;">${randomType.label}</span>
-      ${i === currentPosition ? '<i class="fa-solid fa-location-dot" style="color:#facc15;"></i>' : ''}
-    `;
-    container.appendChild(tile);
+// BIFURCACIÓN DE CAMINO
+function choosePath(pathType) {
+  if (pathType === 'verifier') {
+    shields += 2;
+    alert("Tomaste el Camino Verificador. Ganas +2 Escudos, pero avanzarás con más cuidado.");
+  } else {
+    followers += 50;
+    viralLoad += 10;
+    alert("Tomaste el Camino Rápido. Ganas +50 Seguidores, pero la Carga Viral aumenta +10%.");
   }
+  updateHUD();
 }
 
-function roll3DDice() {
-  const roll = Math.floor(Math.random() * 6) + 1;
-  document.getElementById('dice-display').innerText = `🎲 ${roll}`;
-
-  // Actualizar posición
-  currentPosition += roll;
-  if (currentPosition >= BOARD_SIZE) {
-    currentPosition = BOARD_SIZE - 1;
-    alert("¡Felicidades! Completaste la simulación con éxito.");
-  }
-
-  initBoard(); // Re-renderizar fichas
-  triggerModal(boardTiles[currentPosition]);
-}
-
-function triggerModal(tileInfo) {
-  const modal = document.getElementById('game-modal');
-  const title = document.getElementById('modal-title');
-  const desc = document.getElementById('modal-desc');
-  const actions = document.getElementById('modal-actions');
-
+// MANEJO DE MINI-JUEGOS DEL DOCUMENTO
+function openMinigame(type) {
+  const modal = document.getElementById('interactive-modal');
   modal.classList.remove('hidden');
-  actions.innerHTML = '';
 
-  if (tileInfo.type === 'reto') {
-    title.innerText = "🔍 Reto: Detección de Deepfake";
-    desc.innerText = "Se publica un audio atribuyendo declaraciones falsas a una autoridad local. ¿Cómo reaccionas?";
-    
-    actions.innerHTML = `
-      <button class="btn-primary" onclick="resolveChallenge(true)">Usar espectrograma e inspeccionar canal oficial</button>
-      <button class="btn-secondary" onclick="resolveChallenge(false)">Compartir en redes inmediatamente</button>
-    `;
-  } else {
-    title.innerText = `Casilla: ${tileInfo.label}`;
-    desc.innerText = `Has caído en una casilla de evento (${tileInfo.label}).`;
-    actions.innerHTML = `<button class="btn-primary" onclick="closeModal()">Continuar</button>`;
+  // Ocultar todos los minijuegos
+  document.querySelectorAll('.minigame-view').forEach(mg => mg.classList.add('hidden'));
+
+  if (type === 'clickbait') {
+    document.getElementById('minigame-clickbait').classList.remove('hidden');
+  } else if (type === 'deepfake') {
+    document.getElementById('minigame-deepfake').classList.remove('hidden');
+  } else if (type === 'cadena') {
+    document.getElementById('minigame-cadena').classList.remove('hidden');
+    startCoopTimer();
   }
 }
 
-function resolveChallenge(isCorrect) {
-  if (isCorrect) {
-    alert("¡Excelente decisión! Disminuyes la desinformación.");
-    updateViral(-10);
+// RETO CLICKBAIT: Comparar Titular vs Nota
+function toggleArticleBody() {
+  document.getElementById('article-body').classList.toggle('hidden');
+}
+
+function checkClickbait() {
+  const sliderValue = document.getElementById('clickbait-slider').value;
+  if (sliderValue > 60) {
+    alert("¡Correcto! Identificaste que el titular exageraba la nota. Cortas la propagación.");
+    followers += 20;
+    updateViral(-5);
   } else {
-    alert("Error de verificación. La carga viral aumentó.");
-    updateViral(15);
+    alert("Incorrecto. El titular era engañoso y no leíste la nota completa. Subió la carga viral.");
+    updateViral(10);
   }
   closeModal();
 }
 
+// CASILLA COLABORATIVA: Cadena Rota
+function startCoopTimer() {
+  let time = 10;
+  const timerEl = document.getElementById('coop-time');
+  const interval = setInterval(() => {
+    time--;
+    timerEl.innerText = time;
+    if (time <= 0) {
+      clearInterval(interval);
+      closeModal();
+      alert("Se acabó el tiempo. El esfuerzo colectivo falló y la carga viral subió.");
+      updateViral(15);
+    }
+  }, 1000);
+}
+
+function reportBuloCoop() {
+  alert("¡Acción colectiva exitosa! Lograron bajar la Carga Viral para TODOS los jugadores.");
+  updateViral(-15);
+  closeModal();
+}
+
+// BARRERA DE IDIOMA DEL DOCUMENTO
+function changeLanguage(lang) {
+  appLanguage = lang;
+  alert(`Idioma de interfaz cambiado a: ${lang.toUpperCase()}. Los retos pueden aparecer en otros idiomas para simular desinformación global.`);
+}
+
 function updateViral(amount) {
   viralLoad = Math.max(0, Math.min(100, viralLoad + amount));
-  document.getElementById('viral-fill').style.width = `${viralLoad}%`;
-  document.getElementById('viral-percentage').innerText = `${viralLoad}% Riesgo de Infodemia`;
+  document.getElementById('viral-meter').style.width = `${viralLoad}%`;
+  document.getElementById('viral-text').innerText = `${viralLoad}% Carga Viral Global`;
+  updateHUD();
 }
 
-function closeModal() {
-  document.getElementById('game-modal').classList.add('hidden');
+function updateHUD() {
+  document.getElementById('followers-count').innerText = followers;
+  document.getElementById('shields-count').innerText = shields;
 }
 
-function selectAvatar(element, profileName) {
-  document.querySelectorAll('.avatar-card').forEach(c => c.classList.remove('selected'));
-  element.classList.add('selected');
-  playerProfile = profileName;
-  document.getElementById('hud-user').innerText = profileName;
-}
-
-function applyLabTool(toolType) {
-  const resultBox = document.getElementById('lab-result');
-  if (toolType === 'ia') {
-    resultBox.innerText = "🤖 Análisis de IA: Se detectó patrón difuso en bordes y firmas sintéticas de modelo generativo (98% probabilidad de IA).";
-  } else if (toolType === 'meta') {
-    resultBox.innerText = "📅 Metadatos: Imagen tomada originalmente en 2018 (Fuera de contexto).";
+function useShield() {
+  if (shields > 0) {
+    shields--;
+    alert("Utilizaste un Escudo de Verificación para neutralizar el reto sin riesgo.");
+    updateHUD();
+    closeModal();
   } else {
-    resultBox.innerText = "🔗 Rastreo: La imagen no aparece en ninguna agencia de noticias oficial.";
+    alert("No tienes Escudos de Verificación guardados en tu cartera.");
   }
 }
 
-// Inicializar al cargar
-initBoard();
+function closeModal() {
+  document.getElementById('interactive-modal').classList.add('hidden');
+}
