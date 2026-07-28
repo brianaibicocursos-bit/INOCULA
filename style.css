@@ -1,0 +1,164 @@
+:root {
+  --primary: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --bg-dark: #0f172a;
+  --card-bg: #1e293b;
+  --text-light: #f8fafc;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  margin: 0;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  margin: 0;
+  color: var(--primary);
+}
+
+.tagline {
+  font-style: italic;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Barra de Carga Viral */
+.progress-bar-bg {
+  background: #334155;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar-fill {
+  background: var(--danger);
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+/* Controles */
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+button:hover {
+  background-color: #059669;
+}
+
+button:disabled {
+  background-color: #475569;
+  cursor: not-allowed;
+}
+
+/* Tablero de Juego */
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.tile {
+  background-color: var(--card-bg);
+  border: 2px solid #334155;
+  border-radius: 10px;
+  min-height: 90px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  font-size: 0.85rem;
+}
+
+.tile.active {
+  border-color: #facc15;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.5);
+}
+
+.tile-number {
+  font-weight: bold;
+  color: #64748b;
+}
+
+.tile-type {
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+/* Tipos de casillas */
+.tile-reto { border-left: 5px solid var(--warning); }
+.tile-virus { border-left: 5px solid var(--danger); }
+.tile-herramienta { border-left: 5px solid var(--info); }
+.tile-cadena { border-left: 5px solid var(--primary); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.hidden { display: none !important; }
+
+.modal-content {
+  background-color: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#timer-box {
+  margin: 15px 0;
+  font-weight: bold;
+  color: var(--warning);
+}
