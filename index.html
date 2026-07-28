@@ -3,59 +3,240 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INOCULA - Antes de creer, inocúlate</title>
+  <title>INOCULA · Plataforma Anti-Desinformación</title>
+  
+  <!-- Fuentes e Iconos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <header>
-    <h1>INOCULA</h1>
-    <p class="tagline">Antes de creer, inocúlate</p>
-    <span class="subtext">UNESCO Youth Hackathon</span>
-  </header>
+  <!-- NAVBAR DE NAVEGACIÓN PERMANENTE -->
+  <nav class="navbar">
+    <div class="logo" onclick="navigateTo('page-home')">
+      <i class="fa-solid fa-shield-virus logo-icon"></i>
+      <span>INOCULA</span>
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="navigateTo('page-home')"><i class="fa-solid fa-house"></i> Inicio</button>
+      <button class="nav-btn" onclick="navigateTo('page-setup')"><i class="fa-solid fa-gamepad"></i> Jugar</button>
+      <button class="nav-btn" onclick="navigateTo('page-lab')"><i class="fa-solid fa-microscope"></i> Laboratorio</button>
+      <button class="nav-btn" onclick="navigateTo('page-leaderboard')"><i class="fa-solid fa-trophy"></i> Ranking</button>
+    </div>
+    <div class="hackathon-badge">
+      <i class="fa-solid fa-award"></i> UNESCO Youth 2026
+    </div>
+  </nav>
 
-  <main class="container">
-    <!-- Panel lateral de Estado / Carga Viral -->
-    <aside class="sidebar">
-      <div class="card">
-        <h3>Carga Viral</h3>
-        <p>Propagación del bulo en internet:</p>
-        <div class="progress-bar-bg">
-          <div id="virus-bar" class="progress-bar-fill" style="width: 0%;"></div>
-        </div>
-        <p id="virus-status">0% - Todo bajo control</p>
-      </div>
-
-      <div class="card control-panel">
-        <h3>Tu Turno</h3>
-        <p>Posición actual: Casilla <span id="player-pos">0</span></p>
-        <button id="btn-roll" onclick="rollDice()">🎲 Tirar Dado</button>
-        <p id="dice-result"></p>
-      </div>
-    </aside>
-
-    <!-- Tablero de Juego -->
-    <section class="board-container">
-      <h2>Tablero de Navegación Digital</h2>
-      <div id="board" class="board-grid">
-        <!-- Las casillas se generan dinámicamente con JavaScript -->
-      </div>
-    </section>
-  </main>
-
-  <!-- Ventana Modal para Eventos y Retos -->
-  <div id="modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <h3 id="modal-title">Título del Reto</h3>
-      <p id="modal-desc">Descripción aquí...</p>
+  <!-- PÁGINA 1: HOME / LANDING -->
+  <section id="page-home" class="page-view active animate__animated animate__fadeIn">
+    <div class="hero">
+      <span class="pill-tag"><i class="fa-solid fa-sparkles"></i> Hackathon Proposal</span>
+      <h1>Antes de creer, <span class="gradient-text">inocúlate.</span></h1>
+      <p class="hero-subtext">
+        El primer juego de tablero digital que te entrena para detectar fake news, 
+        imágenes de IA y desinformación en tiempo real antes de compartirlos.
+      </p>
       
-      <!-- Temporizador para retos -->
-      <div id="timer-box" class="hidden">
-        Tiempo restante: <span id="timer-count">15</span>s
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="navigateTo('page-setup')">
+          <i class="fa-solid fa-play"></i> Iniciar Partida
+        </button>
+        <button class="btn-secondary" onclick="navigateTo('page-lab')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Explorar Herramientas
+        </button>
       </div>
 
-      <div id="modal-actions" class="modal-buttons">
-        <!-- Los botones de opciones se insertan con JS -->
+      <div class="hero-stats">
+        <div class="stat-card">
+          <h2>+95%</h2>
+          <p>Efectividad en detección</p>
+        </div>
+        <div class="stat-card">
+          <h2>4</h2>
+          <p>Mecánicas de Juego</p>
+        </div>
+        <div class="stat-card">
+          <h2>0%</h2>
+          <p>Propagación de Bulo</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PÁGINA 2: SELECCIÓN DE JUGADOR -->
+  <section id="page-setup" class="page-view hidden animate__animated animate__fadeIn">
+    <div class="setup-container">
+      <h2>Configura tu Identidad Digital</h2>
+      <p>Elige tu perfil de verificador antes de saltar al tablero:</p>
+      
+      <div class="avatar-grid">
+        <div class="avatar-card selected" onclick="selectAvatar(this, 'Investigador')">
+          <div class="avatar-icon"><i class="fa-solid fa-user-ninja"></i></div>
+          <h3>Ciber-Detective</h3>
+          <p>Especialista en metadatos y rastreo de imágenes.</p>
+        </div>
+        <div class="avatar-card" onclick="selectAvatar(this, 'Periodista')">
+          <div class="avatar-icon"><i class="fa-solid fa-newspaper"></i></div>
+          <h3>Fact-Checker</h3>
+          <p>Experto en cruce de fuentes y contrastación de datos.</p>
+        </div>
+        <div class="avatar-card" onclick="selectAvatar(this, 'Estudiante')">
+          <div class="avatar-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <h3>Nativo Digital</h3>
+          <p>Rápido detectando anomalías visuales en IA.</p>
+        </div>
+      </div>
+
+      <button class="btn-primary btn-large" onclick="navigateTo('page-game')">
+        Entrar al Tablero <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- PÁGINA 3: TABLERO DE JUEGO PRINCIPAL -->
+  <section id="page-game" class="page-view hidden animate__animated animate__fadeIn">
+    <div class="game-layout">
+      
+      <!-- Panel Izquierdo: Stats y Herramientas -->
+      <aside class="game-sidebar">
+        <div class="hud-card">
+          <div class="user-profile">
+            <i class="fa-solid fa-circle-user profile-pic"></i>
+            <div>
+              <h4 id="hud-user">Ciber-Detective</h4>
+              <span class="level-badge">Nivel 1 Verificador</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-card">
+          <h3><i class="fa-solid fa-biohazard"></i> Carga Viral Global</h3>
+          <div class="viral-meter-wrapper">
+            <div id="viral-fill" class="viral-meter-fill" style="width: 25%;"></div>
+          </div>
+          <span id="viral-percentage" class="viral-text">25% Riesgo de Infodemia</span>
+        </div>
+
+        <div class="hud-card">
+          <h3><i class="fa-solid fa-toolbox"></i> Tus Herramientas</h3>
+          <div class="inventory">
+            <div class="inventory-item" title="Búsqueda Inversa"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div class="inventory-item" title="Metadatos Exif"><i class="fa-solid fa-file-code"></i></div>
+            <div class="inventory-item" title="Detector IA"><i class="fa-solid fa-robot"></i></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Zona Central: Tablero de Juego -->
+      <main class="game-board-area">
+        <div class="board-header">
+          <h2>Tablero de Navegación en Redes</h2>
+          <div class="dice-area">
+            <button id="dice-btn" class="btn-dice" onclick="roll3DDice()">
+              <i class="fa-solid fa-dice-d6"></i> Tirar Dado
+            </button>
+            <div id="dice-display" class="dice-result-badge">🎲 -</div>
+          </div>
+        </div>
+
+        <div id="interactive-board" class="tiles-grid">
+          <!-- Generado dinámicamente -->
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- PÁGINA 4: LABORATORIO DE VERIFICACIÓN -->
+  <section id="page-lab" class="page-view hidden animate__animated animate__fadeIn">
+    <div class="lab-container">
+      <h2><i class="fa-solid fa-flask"></i> Laboratorio de Análisis de Bulo</h2>
+      <p>Aprende a usar las herramientas del juego con este simulador interactivo:</p>
+
+      <div class="lab-workspace">
+        <div class="inspection-card">
+          <div class="fake-post">
+            <div class="post-header">
+              <i class="fa-solid fa-circle-user"></i>
+              <span>@NoticiasViral_OK</span>
+            </div>
+            <img src="https://picsum.photos/600/350" alt="Noticia sospechosa" class="post-img" />
+            <p class="post-text">🚨 ¡ÚLTIMA HORA! Científicos afirman que la luna es de queso digital. #VIRAL</p>
+          </div>
+        </div>
+
+        <div class="lab-tools">
+          <h3>Análisis de Evidencias</h3>
+          <button class="lab-tool-btn" onclick="applyLabTool('ia')"><i class="fa-solid fa-robot"></i> Escanear Marcas de IA</button>
+          <button class="lab-tool-btn" onclick="applyLabTool('meta')"><i class="fa-solid fa-database"></i> Ver Fecha y Metadatos</button>
+          <button class="lab-tool-btn" onclick="applyLabTool('source')"><i class="fa-solid fa-link"></i> Rastrear Fuente Original</button>
+          
+          <div id="lab-result" class="lab-result-box">
+            Haz clic en una herramienta para inspeccionar la publicación.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PÁGINA 5: RANKING -->
+  <section id="page-leaderboard" class="page-view hidden animate__animated animate__fadeIn">
+    <div class="leaderboard-container">
+      <h2><i class="fa-solid fa-trophy"></i> Salón de la Fama INOCULA</h2>
+      <p>Top de escuadrones que han detenido la carga viral:</p>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Posición</th>
+              <th>Verificador</th>
+              <th>Bulos Detenidos</th>
+              <th>Puntaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="top-1">
+              <td>🥇 #1</td>
+              <td>UNESCO_Team_Alpha</td>
+              <td>42</td>
+              <td>9,850 pts</td>
+            </tr>
+            <tr class="top-2">
+              <td>🥈 #2</td>
+              <td>CyberGuardians</td>
+              <td>38</td>
+              <td>8,900 pts</td>
+            </tr>
+            <tr class="top-3">
+              <td>🥉 #3</td>
+              <td>FactCheckers_MX</td>
+              <td>31</td>
+              <td>7,400 pts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE RETOS (Súper Estilizado) -->
+  <div id="game-modal" class="modal-overlay hidden">
+    <div class="modal-card animate__animated animate__zoomIn">
+      <div class="modal-header">
+        <span id="modal-type-badge" class="badge-reto">DESAFÍO</span>
+        <h3 id="modal-title">Título del Reto</h3>
+      </div>
+      <div class="modal-body">
+        <p id="modal-desc">Descripción detallada...</p>
+        <div id="modal-timer" class="timer-pill"><i class="fa-solid fa-stopwatch"></i> <span id="time-left">10</span>s</div>
+      </div>
+      <div id="modal-actions" class="modal-footer">
+        <!-- Botones dinámicos -->
       </div>
     </div>
   </div>
