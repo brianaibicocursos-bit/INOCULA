@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>INOCULA - Antes de creer, inocúlate</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header>
+    <h1>INOCULA</h1>
+    <p class="tagline">Antes de creer, inocúlate</p>
+    <span class="subtext">UNESCO Youth Hackathon</span>
+  </header>
+
+  <main class="container">
+    <!-- Panel lateral de Estado / Carga Viral -->
+    <aside class="sidebar">
+      <div class="card">
+        <h3>Carga Viral</h3>
+        <p>Propagación del bulo en internet:</p>
+        <div class="progress-bar-bg">
+          <div id="virus-bar" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+        <p id="virus-status">0% - Todo bajo control</p>
+      </div>
+
+      <div class="card control-panel">
+        <h3>Tu Turno</h3>
+        <p>Posición actual: Casilla <span id="player-pos">0</span></p>
+        <button id="btn-roll" onclick="rollDice()">🎲 Tirar Dado</button>
+        <p id="dice-result"></p>
+      </div>
+    </aside>
+
+    <!-- Tablero de Juego -->
+    <section class="board-container">
+      <h2>Tablero de Navegación Digital</h2>
+      <div id="board" class="board-grid">
+        <!-- Las casillas se generan dinámicamente con JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Ventana Modal para Eventos y Retos -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 id="modal-title">Título del Reto</h3>
+      <p id="modal-desc">Descripción aquí...</p>
+      
+      <!-- Temporizador para retos -->
+      <div id="timer-box" class="hidden">
+        Tiempo restante: <span id="timer-count">15</span>s
+      </div>
+
+      <div id="modal-actions" class="modal-buttons">
+        <!-- Los botones de opciones se insertan con JS -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
