@@ -5,167 +5,221 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>INOCULA · Tablero de Vida Digital</title>
   
+  <!-- Tipografía e Iconos -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
+  <!-- Estilos Locales -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- NAVBAR & CONFIGURACIÓN -->
+  <!-- NAVBAR DE NAVEGACIÓN ENTRE PÁGINAS -->
   <nav class="navbar">
-    <div class="logo">
+    <div class="logo" onclick="navigateTo('page-home')">
       <i class="fa-solid fa-shield-virus"></i>
       <span>INOCULA</span>
     </div>
-    
-    <!-- Selector de Idioma (Español, English, 中文) -->
-    <div class="lang-selector">
-      <i class="fa-solid fa-globe"></i>
-      <select id="lang-select" onchange="changeLanguage(this.value)">
-        <option value="es">Español</option>
-        <option value="en">English</option>
-        <option value="zh">中文 (Chinese)</option>
-      </select>
+
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="navigateTo('page-home')"><i class="fa-solid fa-house"></i> Inicio</button>
+      <button class="nav-btn" onclick="navigateTo('page-game')"><i class="fa-solid fa-gamepad"></i> Tablero</button>
+      <button class="nav-btn" onclick="navigateTo('page-lab')"><i class="fa-solid fa-flask"></i> Laboratorio</button>
+      <button class="nav-btn" onclick="navigateTo('page-leaderboard')"><i class="fa-solid fa-trophy"></i> Ranking</button>
     </div>
 
-    <!-- Selector de Nivel de Edad -->
-    <div class="age-selector">
-      <select id="age-select">
-        <option value="kids">Niños</option>
-        <option value="general" selected>Público General</option>
-        <option value="seniors">Adultos Mayores</option>
-      </select>
-    </div>
+    <div class="nav-controls">
+      <div class="lang-selector">
+        <i class="fa-solid fa-globe"></i>
+        <select id="lang-select" onchange="changeLanguage(this.value)">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
 
-    <div class="hackathon-badge">UNESCO Youth 2026</div>
+      <div class="hackathon-badge">UNESCO Youth 2026</div>
+    </div>
   </nav>
 
-  <main class="main-layout">
-    <!-- PANEL DE ESTADO DIGITAL (Estilo Life) -->
-    <aside class="status-panel">
-      <!-- Carga Viral Pública Global -->
-      <div class="status-card viral-card">
-        <h3><i class="fa-solid fa-biohazard"></i> Carga Viral Pública</h3>
-        <div class="progress-bar">
-          <div id="viral-meter" class="progress-fill" style="width: 15%;"></div>
-        </div>
-        <p id="viral-text">15% - Virus bajo control</p>
-      </div>
-
-      <!-- Cartera del Jugador: Seguidores y Escudos -->
-      <div class="status-card player-card">
-        <h3><i class="fa-solid fa-user-check"></i> Perfil Digital</h3>
-        <div class="stat-row">
-          <span><i class="fa-solid fa-users" style="color: #3b82f6;"></i> Seguidores Confiables:</span>
-          <strong id="followers-count">100</strong>
-        </div>
-        <div class="stat-row">
-          <span><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Escudos de Verificación:</span>
-          <strong id="shields-count">1</strong>
-        </div>
-      </div>
-
-      <!-- Control de Ruleta Giratoria -->
-      <div class="status-card spinner-card">
-        <h3><i class="fa-solid fa-dharmachakra"></i> Rueda Digital</h3>
-        <div id="wheel-display" class="wheel-box">
-          <span>Gira la Rueda</span>
-        </div>
-        <button id="spin-btn" class="btn-spin" onclick="spinWheel()">GIRAR RUEDA</button>
-      </div>
-    </aside>
-
-    <!-- EL TABLERO DE VIDA SERPENTEANTE (4 ETAPAS DEL DÍA) -->
-    <section class="board-wrapper">
-      <h2>Día a Día en Internet</h2>
+  <!-- PÁGINA 1: LANDING / INICIO -->
+  <section id="page-home" class="page-view active">
+    <div class="hero">
+      <span class="pill-tag"><i class="fa-solid fa-sparkles"></i> UNESCO Youth Hackathon 2026</span>
+      <h1>Antes de creer, <span class="gradient-text">inocúlate.</span></h1>
+      <p class="hero-subtext">
+        El tablero de vida digital que te entrena para detectar fake news, 
+        deepfakes y manipulación en tu día a día digital.
+      </p>
       
-      <div class="path-container">
-        <!-- ETAPA 1: Despertar y Feed Matutino -->
-        <div class="day-stage stage-morning">
-          <span class="stage-label">Etapa 1: Despertar & Feed Matutino</span>
-          <div class="stage-tiles" id="stage-1"></div>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="navigateTo('page-game')">
+          <i class="fa-solid fa-play"></i> Entrar al Tablero
+        </button>
+        <button class="btn-secondary" onclick="navigateTo('page-lab')">
+          <i class="fa-solid fa-microscope"></i> Probar Herramientas
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-card">
+          <h2>4</h2>
+          <p>Etapas del Día</p>
+        </div>
+        <div class="stat-card">
+          <h2>3</h2>
+          <p>Idiomas (ES, EN, ZH)</p>
+        </div>
+        <div class="stat-card">
+          <h2>0%</h2>
+          <p>Carga Viral Meta</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PÁGINA 2: TABLERO DE JUEGO (GAME OF LIFE) -->
+  <section id="page-game" class="page-view hidden">
+    <main class="main-layout">
+      <!-- PANEL DE ESTADO DIGITAL -->
+      <aside class="status-panel">
+        <div class="status-card viral-card">
+          <h3><i class="fa-solid fa-biohazard"></i> Carga Viral Pública</h3>
+          <div class="progress-bar">
+            <div id="viral-meter" class="progress-fill" style="width: 15%;"></div>
+          </div>
+          <p id="viral-text">15% - Virus bajo control</p>
         </div>
 
-        <!-- BIFURCACIÓN DE CAMINO 1 -->
-        <div class="bifurcation-box">
-          <h4>🔀 ¡Punto de Bifurcación! Elige tu estilo de navegación:</h4>
-          <div class="bifurcation-options">
-            <button class="btn-path path-verifier" onclick="choosePath('verifier')">
-              <strong>Camino Verificador</strong><br><small>Más lento, más Escudos y protección</small>
-            </button>
-            <button class="btn-path path-fast" onclick="choosePath('fast')">
-              <strong>Camino Rápido</strong><br><small>Avanzas rápido, pero caes en más Fake News</small>
-            </button>
+        <div class="status-card player-card">
+          <h3><i class="fa-solid fa-user-check"></i> Perfil Digital</h3>
+          <div class="stat-row">
+            <span><i class="fa-solid fa-users" style="color: #3b82f6;"></i> Seguidores:</span>
+            <strong id="followers-count">100</strong>
+          </div>
+          <div class="stat-row">
+            <span><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Escudos:</span>
+            <strong id="shields-count">1</strong>
           </div>
         </div>
 
-        <!-- ETAPA 2: Trabajo / Escuela -->
-        <div class="day-stage stage-work">
-          <span class="stage-label">Etapa 2: Trabajo / Escuela & Chats</span>
-          <div class="stage-tiles" id="stage-2"></div>
+        <div class="status-card spinner-card">
+          <h3><i class="fa-solid fa-dharmachakra"></i> Rueda Digital</h3>
+          <div id="wheel-display" class="wheel-box">
+            <span>Gira la Rueda</span>
+          </div>
+          <button id="spin-btn" class="btn-spin" onclick="spinWheel()">GIRAR RUEDA</button>
         </div>
+      </aside>
 
-        <!-- ETAPA 3: Tarde y Redes -->
-        <div class="day-stage stage-afternoon">
-          <span class="stage-label">Etapa 3: Tarde, Noticias & Redes</span>
-          <div class="stage-tiles" id="stage-3"></div>
+      <!-- TABLERO -->
+      <section class="board-wrapper">
+        <h2>Tablero: Tu Navegación Diaria</h2>
+        
+        <div class="path-container">
+          <div class="day-stage stage-morning">
+            <span class="stage-label">Etapa 1: Despertar & Feed Matutino</span>
+            <div class="stage-tiles" id="stage-1"></div>
+          </div>
+
+          <div class="bifurcation-box">
+            <h4><i class="fa-solid fa-code-fork"></i> ¡Punto de Bifurcación! Elige tu camino:</h4>
+            <div class="bifurcation-options">
+              <button class="btn-path path-verifier" onclick="choosePath('verifier')">
+                <strong>Camino Verificador</strong><br><small>Más lento, gana Escudos de protección</small>
+              </button>
+              <button class="btn-path path-fast" onclick="choosePath('fast')">
+                <strong>Camino Rápido</strong><br><small>Avanzas rápido, asumes riesgo de Fake News</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="day-stage stage-work">
+            <span class="stage-label">Etapa 2: Trabajo / Escuela & Chats</span>
+            <div class="stage-tiles" id="stage-2"></div>
+          </div>
+
+          <div class="day-stage stage-afternoon">
+            <span class="stage-label">Etapa 3: Tarde, Noticias & Redes</span>
+            <div class="stage-tiles" id="stage-3"></div>
+          </div>
+
+          <div class="day-stage stage-night">
+            <span class="stage-label">Etapa 4: Noche, Viral & Retiro Digital</span>
+            <div class="stage-tiles" id="stage-4"></div>
+          </div>
         </div>
+      </section>
+    </main>
+  </section>
 
-        <!-- ETAPA 4: Noche y Cierre del Día -->
-        <div class="day-stage stage-night">
-          <span class="stage-label">Etapa 4: Noche, Viral & Retiro Digital</span>
-          <div class="stage-tiles" id="stage-4"></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- MODAL DE MINI-JUEGOS DE INTERACCIÓN ESPECÍFICOS -->
-  <div id="interactive-modal" class="modal-overlay hidden">
-    <div class="modal-container">
+  <!-- PÁGINA 3: LABORATORIO -->
+  <section id="page-lab" class="page-view hidden">
+    <div class="lab-container">
+      <h2><i class="fa-solid fa-flask"></i> Laboratorio de Verificación</h2>
+      <p>Simulador interactivo para analizar noticias antes de compartirlas:</p>
       
-      <!-- MINI-JUEGO 1: CLICKBAIT (Slider Titular vs Nota) -->
+      <div class="lab-card">
+        <div class="fake-post">
+          <h4>🚨 NOTICIA TENDENCIA: "Descubren que las imágenes satelitales son falsas"</h4>
+          <p>Publicado por @ViralNews_99 hace 5 minutos</p>
+        </div>
+        <div class="lab-buttons">
+          <button class="btn-secondary" onclick="runLabTool('ia')"><i class="fa-solid fa-robot"></i> Escanear IA</button>
+          <button class="btn-secondary" onclick="runLabTool('source')"><i class="fa-solid fa-link"></i> Buscar Fuente Original</button>
+          <button class="btn-secondary" onclick="runLabTool('meta')"><i class="fa-solid fa-file-code"></i> Revisar Metadatos</button>
+        </div>
+        <div id="lab-output" class="lab-output-box">Selecciona una herramienta para inspeccionar el contenido.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PÁGINA 4: RANKING -->
+  <section id="page-leaderboard" class="page-view hidden">
+    <div class="leaderboard-container">
+      <h2><i class="fa-solid fa-trophy"></i> Agentes INOCULA Destacados</h2>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Posición</th>
+              <th>Agente</th>
+              <th>Seguidores Confiables</th>
+              <th>Carga Viral Evitada</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>🥇 #1</td><td>Agente_Bree</td><td>950</td><td>-80%</td></tr>
+            <tr><td>🥈 #2</td><td>FactChecker_Kendra</td><td>820</td><td>-65%</td></tr>
+            <tr><td>🥉 #3</td><td>Cyber_Carolina</td><td>740</td><td>-50%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DE RETOS (Súper Visual) -->
+  <div id="interactive-modal" class="modal-overlay hidden">
+    <div class="modal-card">
       <div id="minigame-clickbait" class="minigame-view hidden">
-        <h3><i class="fa-solid fa-newspaper"></i> Reto CLICKBAIT</h3>
-        <p class="headline">"¡Este alimento cotidiano destruye tu salud en segundos!"</p>
+        <h3><i class="fa-solid fa-newspaper"></i> Reto: Titular vs Nota</h3>
+        <p class="headline">"¡Este alimento destruye tu salud en segundos!"</p>
         <button class="btn-secondary" onclick="toggleArticleBody()">📄 Leer nota completa</button>
         <div id="article-body" class="article-text hidden">
-          "Un estudio en 10 personas sugiere que el consumo excesivo de sal de mesa durante 30 años podría elevar ligeramente la presión arterial en predisposiciones genéticas."
+          "Un estudio en 10 personas sugiere que el consumo excesivo de sal durante 30 años podría elevar ligeramente la presión arterial."
         </div>
         <div class="slider-box">
           <label>¿El titular representa la nota o exagera?</label>
           <input type="range" id="clickbait-slider" min="0" max="100" value="50">
-          <div class="slider-labels">
-            <span>Representa fielmente</span>
-            <span>Exagera totalmente</span>
-          </div>
         </div>
         <button class="btn-primary" onclick="checkClickbait()">Confirmar Evaluación</button>
       </div>
 
-      <!-- MINI-JUEGO 2: DEEPFAKE (Lupa de Inspección) -->
-      <div id="minigame-deepfake" class="minigame-view hidden">
-        <h3><i class="fa-solid fa-eye"></i> Reto DEEPFAKE / IA</h3>
-        <p>Encuentra las señales de IA en la imagen (haz clic en la anomalía):</p>
-        <div class="image-inspector">
-          <img src="https://picsum.photos/400/250" alt="Inspeccionar" />
-          <div class="hotspot" style="top: 30%; left: 40%;" onclick="foundAnomaly(true)"></div>
-        </div>
-      </div>
-
-      <!-- MINI-JUEGO 3: CADENA ROTA (Colaborativo) -->
-      <div id="minigame-cadena" class="minigame-view hidden">
-        <h3><i class="fa-solid fa-link-slash"></i> ¡Reto Colaborativo: Cadena Rota!</h3>
-        <p>Un bulo grave se propagando. ¡Todos los jugadores deben presionar "REPORTAR" a la vez!</p>
-        <div class="coop-timer">Tiempo restante: <span id="coop-time">10</span>s</div>
-        <button class="btn-danger-large" onclick="reportBuloCoop()">🚨 ¡REPORTAR AHORA!</button>
-      </div>
-
-      <!-- ACCIONES COMUNES -->
       <div class="modal-footer">
         <button class="btn-secondary" onclick="useShield()">🛡️ Usar Escudo para Saltar</button>
+        <button class="btn-danger" onclick="closeModal()">Cerrar</button>
       </div>
     </div>
   </div>
