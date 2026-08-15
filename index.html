@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,871 +9,519 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  >
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-  <!-- =========================
-       NAVBAR
-  ========================== -->
+<nav class="navbar">
 
-  <nav class="navbar">
+  <div class="logo" onclick="navigateTo('page-home')">
+    <i class="fa-solid fa-shield-virus"></i>
+    <span>INOCULA</span>
+  </div>
 
-    <div class="logo" onclick="navigateTo('page-home')">
-      <div class="logo-icon">
-        <i class="fa-solid fa-shield-halved"></i>
-      </div>
+  <div class="nav-links">
+    <button class="nav-btn active" data-page="page-home" onclick="navigateTo('page-home')">
+      <i class="fa-solid fa-house"></i>
+      <span data-i18n="navHome">Inicio</span>
+    </button>
 
-      <span>INOCULA</span>
+    <button class="nav-btn" data-page="page-game" onclick="navigateTo('page-game')">
+      <i class="fa-solid fa-gamepad"></i>
+      <span data-i18n="navBoard">Tablero</span>
+    </button>
+
+    <button class="nav-btn" data-page="page-lab" onclick="navigateTo('page-lab')">
+      <i class="fa-solid fa-flask"></i>
+      <span data-i18n="navLab">Laboratorio</span>
+    </button>
+
+    <button class="nav-btn" data-page="page-leaderboard" onclick="navigateTo('page-leaderboard')">
+      <i class="fa-solid fa-trophy"></i>
+      <span data-i18n="navRanking">Ranking</span>
+    </button>
+  </div>
+
+  <div class="nav-controls">
+
+    <div class="lang-selector">
+      <i class="fa-solid fa-globe"></i>
+
+      <select id="lang-select" onchange="changeLanguage(this.value)">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+      </select>
     </div>
 
-    <div class="nav-links">
+    <div class="hackathon-badge">
+      UNESCO Youth 2026
+    </div>
 
-      <button
-        class="nav-btn active"
-        data-page="page-home"
-        onclick="navigateTo('page-home')"
-      >
-        <i class="fa-solid fa-house"></i>
-        <span data-i18n="navHome">Inicio</span>
+  </div>
+</nav>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="page-home" class="page-view active">
+
+  <div class="hero">
+
+    <span class="pill-tag">
+      <i class="fa-solid fa-sparkles"></i>
+      <span data-i18n="heroTag">UNESCO Youth Hackathon 2026</span>
+    </span>
+
+    <h1 data-i18n="heroTitle">
+      Antes de creer, <span class="gradient-text">inocúlate.</span>
+    </h1>
+
+    <p class="hero-subtext" data-i18n="heroText">
+      El tablero de vida digital que te entrena para detectar fake news,
+      deepfakes y manipulación en tu día a día digital.
+    </p>
+
+    <div class="hero-buttons">
+
+      <button class="btn-primary" onclick="navigateTo('page-game')">
+        <i class="fa-solid fa-play"></i>
+        <span data-i18n="enterBoard">Entrar al Tablero</span>
       </button>
 
-      <button
-        class="nav-btn"
-        data-page="page-game"
-        onclick="navigateTo('page-game')"
-      >
-        <i class="fa-solid fa-gamepad"></i>
-        <span data-i18n="navBoard">Tablero</span>
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="page-lab"
-        onclick="navigateTo('page-lab')"
-      >
-        <i class="fa-solid fa-flask"></i>
-        <span data-i18n="navLab">Laboratorio</span>
-      </button>
-
-      <button
-        class="nav-btn"
-        data-page="page-leaderboard"
-        onclick="navigateTo('page-leaderboard')"
-      >
-        <i class="fa-solid fa-trophy"></i>
-        <span data-i18n="navRanking">Ranking</span>
+      <button class="btn-secondary" onclick="navigateTo('page-lab')">
+        <i class="fa-solid fa-microscope"></i>
+        <span data-i18n="tryTools">Probar Herramientas</span>
       </button>
 
     </div>
 
-    <div class="nav-controls">
+    <div class="hero-stats">
 
-      <div class="lang-selector">
-        <i class="fa-solid fa-globe"></i>
-
-        <select id="lang-select" onchange="changeLanguage(this.value)">
-          <option value="es">Español</option>
-          <option value="en">English</option>
-          <option value="zh">中文</option>
-        </select>
+      <div class="stat-card">
+        <h2>4</h2>
+        <p data-i18n="dayStages">Etapas del Día</p>
       </div>
 
-      <div class="hackathon-badge">
-        UNESCO Youth 2026
+      <div class="stat-card">
+        <h2>3</h2>
+        <p data-i18n="languages">Idiomas</p>
       </div>
 
-    </div>
-
-  </nav>
-
-
-  <!-- =========================
-       HOME
-  ========================== -->
-
-  <section id="page-home" class="page-view active">
-
-    <div class="hero">
-
-      <div class="hero-decoration decoration-one">✦</div>
-      <div class="hero-decoration decoration-two">✦</div>
-      <div class="hero-decoration decoration-three">●</div>
-
-      <span class="pill-tag">
-        <i class="fa-solid fa-sparkles"></i>
-        <span data-i18n="heroTag">UNESCO Youth Hackathon 2026</span>
-      </span>
-
-      <h1>
-        <span data-i18n="heroTitleOne">
-          Antes de creer,
-        </span>
-
-        <span class="gradient-text" data-i18n="heroTitleTwo">
-          inocúlate.
-        </span>
-      </h1>
-
-      <p class="hero-subtext" data-i18n="heroText">
-        El tablero de vida digital que te entrena para detectar fake news,
-        deepfakes y manipulación en tu día a día digital.
-      </p>
-
-      <div class="hero-buttons">
-
-        <button
-          class="btn-primary"
-          onclick="navigateTo('page-game')"
-        >
-          <i class="fa-solid fa-play"></i>
-          <span data-i18n="enterBoard">Entrar al Tablero</span>
-        </button>
-
-        <button
-          class="btn-secondary"
-          onclick="navigateTo('page-lab')"
-        >
-          <i class="fa-solid fa-microscope"></i>
-          <span data-i18n="tryTools">Probar Herramientas</span>
-        </button>
-
-      </div>
-
-
-      <div class="hero-stats">
-
-        <div class="stat-card">
-          <div class="stat-icon">☀️</div>
-          <h2>4</h2>
-          <p data-i18n="dayStages">Etapas del Día</p>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">🌎</div>
-          <h2>3</h2>
-          <p data-i18n="languages">Idiomas</p>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">🛡️</div>
-          <h2>0%</h2>
-          <p data-i18n="viralTarget">Carga Viral Meta</p>
-        </div>
-
+      <div class="stat-card">
+        <h2>0%</h2>
+        <p data-i18n="viralGoal">Carga Viral Meta</p>
       </div>
 
     </div>
 
-  </section>
+  </div>
 
+</section>
 
-  <!-- =========================
-       GAME
-  ========================== -->
 
-  <section id="page-game" class="page-view hidden">
+<!-- ================= GAME ================= -->
 
-    <main class="main-layout">
+<section id="page-game" class="page-view hidden">
 
-      <!-- SIDEBAR -->
+  <main class="main-layout">
 
-      <aside class="status-panel">
+    <aside class="status-panel">
 
-        <!-- VIRAL -->
+      <div class="status-card viral-card">
 
-        <div class="status-card viral-card">
-
-          <h3>
-            <i class="fa-solid fa-biohazard"></i>
-            <span data-i18n="viralLoad">Carga Viral Pública</span>
-          </h3>
-
-          <div class="progress-bar">
-            <div
-              id="viral-meter"
-              class="progress-fill"
-              style="width:15%"
-            ></div>
-          </div>
-
-          <p id="viral-text">
-            15% - Virus bajo control
-          </p>
-
-        </div>
-
-
-        <!-- PROFILE -->
-
-        <div class="status-card player-card">
-
-          <h3>
-            <i class="fa-solid fa-user-check"></i>
-            <span data-i18n="digitalProfile">Perfil Digital</span>
-          </h3>
-
-          <div class="stat-row">
-            <span>
-              <i class="fa-solid fa-users"></i>
-              <span data-i18n="followers">Seguidores:</span>
-            </span>
-
-            <strong id="followers-count">100</strong>
-          </div>
-
-          <div class="stat-row">
-            <span>
-              <i class="fa-solid fa-shield-halved"></i>
-              <span data-i18n="shields">Escudos:</span>
-            </span>
-
-            <strong id="shields-count">1</strong>
-          </div>
-
-        </div>
-
-
-        <!-- CHARACTER -->
-
-        <div class="status-card character-card">
-
-          <h3>
-            <i class="fa-solid fa-user-astronaut"></i>
-            <span data-i18n="chooseCharacter">
-              Elige tu personaje
-            </span>
-          </h3>
-
-          <div class="character-options">
-
-            <button
-              class="character-option active"
-              data-character="woman"
-              onclick="chooseCharacter('woman')"
-            >
-              👩🏻‍💻
-              <span data-i18n="woman">Mujer</span>
-            </button>
-
-            <button
-              class="character-option"
-              data-character="man"
-              onclick="chooseCharacter('man')"
-            >
-              👨🏻‍💻
-              <span data-i18n="man">Hombre</span>
-            </button>
-
-            <button
-              class="character-option"
-              data-character="neutral"
-              onclick="chooseCharacter('neutral')"
-            >
-              🧑🏻‍💻
-              <span data-i18n="neutral">Neutral</span>
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <!-- WHEEL -->
-
-        <div class="status-card spinner-card">
-
-          <h3>
-            <i class="fa-solid fa-dharmachakra"></i>
-            <span data-i18n="digitalWheel">
-              Rueda Digital
-            </span>
-          </h3>
-
-          <div id="wheel-display" class="wheel-box">
-            <span data-i18n="spinText">
-              Gira la Rueda
-            </span>
-          </div>
-
-          <button
-            id="spin-btn"
-            class="btn-spin"
-            onclick="spinWheel()"
-          >
-            <i class="fa-solid fa-rotate"></i>
-            <span data-i18n="spin">
-              GIRAR RUEDA
-            </span>
-          </button>
-
-        </div>
-
-      </aside>
-
-
-      <!-- BOARD -->
-
-      <section class="board-wrapper">
-
-        <div class="board-heading">
-
-          <div>
-            <span class="section-kicker" data-i18n="digitalJourney">
-              TU VIAJE DIGITAL
-            </span>
-
-            <h2 data-i18n="boardTitle">
-              Tablero: Tu Navegación Diaria
-            </h2>
-          </div>
-
-          <div class="journey-progress">
-
-            <span id="stage-progress-text">
-              1 / 4
-            </span>
-
-            <div class="journey-progress-bar">
-              <div
-                id="stage-progress-fill"
-                style="width:25%"
-              ></div>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <!-- CURRENT STAGE -->
-
-        <div class="current-stage-banner">
-
-          <div class="stage-banner-icon" id="stage-banner-icon">
-            🌅
-          </div>
-
-          <div>
-
-            <span
-              class="small-label"
-              data-i18n="currentStage"
-            >
-              ETAPA ACTUAL
-            </span>
-
-            <strong id="current-stage-name">
-              Etapa 1: Despertar & Feed Matutino
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <!-- BOARD -->
-
-        <div class="path-container">
-
-          <!-- STAGE 1 -->
-
-          <div
-            class="day-stage stage-morning current-stage"
-            data-stage="1"
-          >
-
-            <span
-              class="stage-label"
-              data-i18n="stage1"
-            >
-              Etapa 1: Despertar & Feed Matutino
-            </span>
-
-            <div
-              class="stage-tiles"
-              id="stage-1"
-            ></div>
-
-          </div>
-
-
-          <!-- FORK -->
-
-          <div class="bifurcation-box">
-
-            <div class="fork-icon">
-              🛣️
-            </div>
-
-            <div>
-
-              <h4 data-i18n="forkTitle">
-                ¡Punto de Bifurcación! Elige tu camino:
-              </h4>
-
-              <p data-i18n="forkDescription">
-                Cada decisión cambia tu viaje digital.
-              </p>
-
-            </div>
-
-            <div class="bifurcation-options">
-
-              <button
-                class="btn-path path-verifier"
-                onclick="choosePath('verifier')"
-              >
-
-                <strong data-i18n="verifier">
-                  Camino Verificador
-                </strong>
-
-                <small data-i18n="verifierSmall">
-                  Más lento, gana Escudos de protección
-                </small>
-
-              </button>
-
-
-              <button
-                class="btn-path path-fast"
-                onclick="choosePath('fast')"
-              >
-
-                <strong data-i18n="fast">
-                  Camino Rápido
-                </strong>
-
-                <small data-i18n="fastSmall">
-                  Avanzas rápido, asumes riesgo de Fake News
-                </small>
-
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <!-- STAGE 2 -->
-
-          <div
-            class="day-stage stage-work"
-            data-stage="2"
-          >
-
-            <span
-              class="stage-label"
-              data-i18n="stage2"
-            >
-              Etapa 2: Trabajo / Escuela & Chats
-            </span>
-
-            <div
-              class="stage-tiles"
-              id="stage-2"
-            ></div>
-
-          </div>
-
-
-          <!-- STAGE 3 -->
-
-          <div
-            class="day-stage stage-afternoon"
-            data-stage="3"
-          >
-
-            <span
-              class="stage-label"
-              data-i18n="stage3"
-            >
-              Etapa 3: Tarde, Noticias & Redes
-            </span>
-
-            <div
-              class="stage-tiles"
-              id="stage-3"
-            ></div>
-
-          </div>
-
-
-          <!-- STAGE 4 -->
-
-          <div
-            class="day-stage stage-night"
-            data-stage="4"
-          >
-
-            <span
-              class="stage-label"
-              data-i18n="stage4"
-            >
-              Etapa 4: Noche, Viral & Retiro Digital
-            </span>
-
-            <div
-              class="stage-tiles"
-              id="stage-4"
-            ></div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-    </main>
-
-  </section>
-
-
-  <!-- =========================
-       LAB
-  ========================== -->
-
-  <section id="page-lab" class="page-view hidden">
-
-    <div class="lab-container">
-
-      <span class="section-kicker">
-        INOCULA LAB
-      </span>
-
-      <h2>
-        <i class="fa-solid fa-flask"></i>
-        <span data-i18n="labTitle">
-          Laboratorio de Verificación
-        </span>
-      </h2>
-
-      <p data-i18n="labDescription">
-        Simulador interactivo para analizar noticias antes de compartirlas.
-      </p>
-
-
-      <div class="lab-card">
-
-        <div class="fake-post">
-
-          <span class="fake-post-label" data-i18n="trending">
-            🔥 TRENDING
-          </span>
-
-          <h4 id="lab-news-headline">
-            🚨 ¡Esta noticia podría no ser lo que parece!
-          </h4>
-
-          <p data-i18n="postedBy">
-            Publicado hace 5 minutos
-          </p>
-
-        </div>
-
-
-        <div class="lab-buttons">
-
-          <button
-            class="btn-secondary"
-            onclick="runLabTool('ia')"
-          >
-            <i class="fa-solid fa-robot"></i>
-            <span data-i18n="scanAI">
-              Escanear IA
-            </span>
-          </button>
-
-          <button
-            class="btn-secondary"
-            onclick="runLabTool('source')"
-          >
-            <i class="fa-solid fa-link"></i>
-            <span data-i18n="findSource">
-              Buscar Fuente Original
-            </span>
-          </button>
-
-          <button
-            class="btn-secondary"
-            onclick="runLabTool('meta')"
-          >
-            <i class="fa-solid fa-file-code"></i>
-            <span data-i18n="metadata">
-              Revisar Metadatos
-            </span>
-          </button>
-
-        </div>
-
-
-        <div
-          id="lab-output"
-          class="lab-output-box"
-          data-i18n="labOutput"
-        >
-          Selecciona una herramienta para inspeccionar el contenido.
-        </div>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       RANKING
-  ========================== -->
-
-  <section
-    id="page-leaderboard"
-    class="page-view hidden"
-  >
-
-    <div class="leaderboard-container">
-
-      <span class="section-kicker">
-        INOCULA COMMUNITY
-      </span>
-
-      <h2>
-        <i class="fa-solid fa-trophy"></i>
-        <span data-i18n="rankingTitle">
-          Agentes INOCULA Destacados
-        </span>
-      </h2>
-
-
-      <div class="table-card">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th data-i18n="position">Posición</th>
-              <th data-i18n="agent">Agente</th>
-              <th data-i18n="trustedFollowers">
-                Seguidores Confiables
-              </th>
-              <th data-i18n="avoidedViral">
-                Carga Viral Evitada
-              </th>
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            <tr>
-              <td>🥇 #1</td>
-              <td>Agent_Bree</td>
-              <td>950</td>
-              <td>-80%</td>
-            </tr>
-
-            <tr>
-              <td>🥈 #2</td>
-              <td>FactChecker_Kendra</td>
-              <td>820</td>
-              <td>-65%</td>
-            </tr>
-
-            <tr>
-              <td>🥉 #3</td>
-              <td>Cyber_Carolina</td>
-              <td>740</td>
-              <td>-50%</td>
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       MODAL
-  ========================== -->
-
-  <div
-    id="interactive-modal"
-    class="modal-overlay hidden"
-  >
-
-    <div class="modal-card">
-
-      <div
-        id="minigame-clickbait"
-        class="minigame-view"
-      >
-
-        <div class="challenge-icon">
-          🧠
-        </div>
-
-        <span class="section-kicker">
-          INOCULA CHALLENGE
-        </span>
-
-        <h3 data-i18n="challenge">
-          Reto: Titular vs Nota
+        <h3>
+          <i class="fa-solid fa-biohazard"></i>
+          <span data-i18n="publicViral">Carga Viral Pública</span>
         </h3>
 
-        <p
-          class="headline"
-          id="challenge-headline"
-        >
-        </p>
+        <div class="progress-bar">
+          <div id="viral-meter" class="progress-fill"></div>
+        </div>
+
+        <p id="viral-text"></p>
+
+      </div>
 
 
-        <button
-          class="btn-secondary read-article-btn"
-          onclick="toggleArticleBody()"
-        >
-          <span data-i18n="readArticle">
-            📄 Leer nota completa
+      <div class="status-card player-card">
+
+        <h3>
+          <i class="fa-solid fa-user-check"></i>
+          <span data-i18n="digitalProfile">Perfil Digital</span>
+        </h3>
+
+        <div class="stat-row">
+          <span>
+            <i class="fa-solid fa-users"></i>
+            <span data-i18n="followers">Seguidores:</span>
           </span>
+
+          <strong id="followers-count">100</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>
+            <i class="fa-solid fa-shield-halved"></i>
+            <span data-i18n="shields">Escudos:</span>
+          </span>
+
+          <strong id="shields-count">1</strong>
+        </div>
+
+      </div>
+
+
+      <div class="status-card spinner-card">
+
+        <h3>
+          <i class="fa-solid fa-dharmachakra"></i>
+          <span data-i18n="digitalWheel">Rueda Digital</span>
+        </h3>
+
+        <div id="wheel-display" class="wheel-box">
+          Gira la rueda
+        </div>
+
+        <button id="spin-btn"
+                class="btn-spin"
+                onclick="spinWheel()">
+          GIRAR RUEDA
         </button>
 
+      </div>
 
-        <div
-          id="article-body"
-          class="article-text hidden"
-        >
+    </aside>
+
+
+    <section class="board-wrapper">
+
+      <div class="board-header">
+
+        <div>
+          <h2 data-i18n="boardTitle">
+            Tablero: Tu Navegación Diaria
+          </h2>
+
+          <p data-i18n="boardDescription">
+            Avanza por tu día digital y aprende a detectar la desinformación.
+          </p>
+        </div>
+
+        <div id="stage-indicator" class="stage-indicator">
+          Etapa 1
+        </div>
+
+      </div>
+
+
+      <div class="path-container">
+
+        <div class="day-stage stage-morning">
+
+          <span class="stage-label" data-i18n="stage1">
+            Etapa 1: Despertar & Feed Matutino
+          </span>
+
+          <div class="stage-tiles" id="stage-1"></div>
+
         </div>
 
 
-        <div class="slider-box">
+        <div class="bifurcation-box">
 
-          <label data-i18n="slider">
-            ¿El titular representa la nota o exagera?
-          </label>
+          <h4 data-i18n="forkTitle">
+            ¡Punto de Bifurcación! Elige tu camino:
+          </h4>
 
-          <div class="slider-labels">
-            <span data-i18n="notExaggerated">
-              Representa
-            </span>
+          <div class="bifurcation-options">
 
-            <span data-i18n="exaggerated">
-              Exagera
-            </span>
+            <button class="btn-path path-verifier"
+                    onclick="choosePath('verifier')">
+
+              <strong data-i18n="verifier">
+                Camino Verificador
+              </strong>
+
+              <small data-i18n="verifierSmall">
+                Más lento, gana Escudos de protección
+              </small>
+
+            </button>
+
+
+            <button class="btn-path path-fast"
+                    onclick="choosePath('fast')">
+
+              <strong data-i18n="fast">
+                Camino Rápido
+              </strong>
+
+              <small data-i18n="fastSmall">
+                Avanzas rápido, asumes riesgo de Fake News
+              </small>
+
+            </button>
+
           </div>
 
-          <input
-            type="range"
-            id="clickbait-slider"
-            min="0"
-            max="100"
-            value="50"
-          >
+        </div>
+
+
+        <div class="day-stage stage-work">
+
+          <span class="stage-label" data-i18n="stage2">
+            Etapa 2: Trabajo / Escuela & Chats
+          </span>
+
+          <div class="stage-tiles" id="stage-2"></div>
 
         </div>
 
 
-        <button
-          class="btn-primary confirm-btn"
-          onclick="checkClickbait()"
-        >
-          <span data-i18n="confirm">
-            Confirmar Evaluación
+        <div class="day-stage stage-afternoon">
+
+          <span class="stage-label" data-i18n="stage3">
+            Etapa 3: Tarde, Noticias & Redes
           </span>
+
+          <div class="stage-tiles" id="stage-3"></div>
+
+        </div>
+
+
+        <div class="day-stage stage-night">
+
+          <span class="stage-label" data-i18n="stage4">
+            Etapa 4: Noche, Viral & Retiro Digital
+          </span>
+
+          <div class="stage-tiles" id="stage-4"></div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</section>
+
+
+<!-- ================= LAB ================= -->
+
+<section id="page-lab" class="page-view hidden">
+
+  <div class="lab-container">
+
+    <h2>
+      <i class="fa-solid fa-flask"></i>
+      <span data-i18n="labTitle">
+        Laboratorio de Verificación
+      </span>
+    </h2>
+
+    <p data-i18n="labDescription">
+      Simulador interactivo para analizar noticias antes de compartirlas.
+    </p>
+
+
+    <div class="lab-card">
+
+      <div class="fake-post">
+
+        <div class="fake-post-label" data-i18n="trending">
+          NOTICIA EN TENDENCIA
+        </div>
+
+        <h4 id="lab-headline">
+          🚨 La información viral debe verificarse antes de compartirla.
+        </h4>
+
+        <p id="lab-source">
+          @ViralNews_99 · 5 min
+        </p>
+
+      </div>
+
+
+      <div class="lab-buttons">
+
+        <button class="btn-secondary"
+                onclick="runLabTool('ia')">
+          <i class="fa-solid fa-robot"></i>
+          <span data-i18n="scanAI">Escanear IA</span>
+        </button>
+
+        <button class="btn-secondary"
+                onclick="runLabTool('source')">
+          <i class="fa-solid fa-link"></i>
+          <span data-i18n="originalSource">Buscar Fuente Original</span>
+        </button>
+
+        <button class="btn-secondary"
+                onclick="runLabTool('meta')">
+          <i class="fa-solid fa-file-code"></i>
+          <span data-i18n="metadata">Revisar Metadatos</span>
         </button>
 
       </div>
 
 
-      <div class="modal-footer">
-
-        <button
-          class="btn-secondary"
-          onclick="useShield()"
-        >
-          <span data-i18n="shield">
-            🛡️ Usar Escudo para Saltar
-          </span>
-        </button>
-
-        <button
-          class="btn-danger"
-          onclick="closeModal()"
-        >
-          <span data-i18n="close">
-            Cerrar
-          </span>
-        </button>
-
+      <div id="lab-output"
+           class="lab-output-box"
+           data-i18n="labOutput">
+        Selecciona una herramienta para inspeccionar el contenido.
       </div>
 
     </div>
 
   </div>
 
+</section>
 
-  <!-- =========================
-       STAGE TRANSITION
-  ========================== -->
 
-  <div
-    id="stage-transition"
-    class="stage-transition hidden"
-  >
+<!-- ================= RANKING ================= -->
 
-    <div class="transition-card">
+<section id="page-leaderboard" class="page-view hidden">
 
-      <div id="transition-icon">
-        🌅
+  <div class="leaderboard-container">
+
+    <h2>
+      <i class="fa-solid fa-trophy"></i>
+      <span data-i18n="rankingTitle">
+        Agentes INOCULA Destacados
+      </span>
+    </h2>
+
+    <div class="table-card">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th data-i18n="position">Posición</th>
+            <th data-i18n="agent">Agente</th>
+            <th data-i18n="trustedFollowers">Seguidores Confiables</th>
+            <th data-i18n="avoidedViral">Carga Viral Evitada</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr>
+            <td>🥇 #1</td>
+            <td>Agent_Bree</td>
+            <td>950</td>
+            <td>-80%</td>
+          </tr>
+
+          <tr>
+            <td>🥈 #2</td>
+            <td>FactChecker_Kendra</td>
+            <td>820</td>
+            <td>-65%</td>
+          </tr>
+
+          <tr>
+            <td>🥉 #3</td>
+            <td>Cyber_Carolina</td>
+            <td>740</td>
+            <td>-50%</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= MODAL ================= -->
+
+<div id="interactive-modal" class="modal-overlay hidden">
+
+  <div class="modal-card">
+
+    <div id="minigame-clickbait" class="minigame-view hidden">
+
+      <div class="challenge-icon">🧠</div>
+
+      <h3 data-i18n="challenge">
+        Reto: Titular vs Nota
+      </h3>
+
+      <p class="headline" id="news-headline"></p>
+
+      <button class="btn-secondary"
+              onclick="toggleArticleBody()"
+              id="read-article-btn">
+        📄 Leer nota completa
+      </button>
+
+      <div id="article-body"
+           class="article-text hidden">
       </div>
 
-      <span
-        class="transition-small"
-        data-i18n="newStage"
-      >
-        NUEVA ETAPA
-      </span>
+      <div class="slider-box">
 
-      <h2 id="transition-title">
-        Etapa 2
-      </h2>
+        <label data-i18n="slider">
+          ¿El titular representa la nota o exagera?
+        </label>
 
-      <p id="transition-description">
-        Continúa tu viaje digital.
-      </p>
+        <input type="range"
+               id="clickbait-slider"
+               min="0"
+               max="100"
+               value="50">
 
-      <button
-        class="btn-primary"
-        onclick="closeStageTransition()"
-      >
-        <span data-i18n="continue">
-          Continuar
-        </span>
+      </div>
+
+      <button class="btn-primary"
+              onclick="checkClickbait()"
+              data-i18n="confirm">
+        Confirmar Evaluación
+      </button>
+
+    </div>
+
+
+    <div class="modal-footer">
+
+      <button class="btn-secondary"
+              onclick="useShield()"
+              data-i18n="shield">
+        🛡️ Usar Escudo para Saltar
+      </button>
+
+      <button class="btn-danger"
+              onclick="closeModal()"
+              data-i18n="close">
+        Cerrar
       </button>
 
     </div>
 
   </div>
 
+</div>
 
-  <script src="app.js"></script>
+
+<script src="app.js"></script>
 
 </body>
 </html>
+```
