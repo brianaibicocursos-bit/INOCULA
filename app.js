@@ -1,723 +1,2300 @@
-// ============================================================
-// INOCULA · APP.JS
-// ============================================================
+/* ============================================================
+   INOCULA · APP.JS
+   Digital Life Board
+   ============================================================ */
 
 
-// ============================================================
-// 1. NAVEGACIÓN
-// ============================================================
+/* ============================================================
+   1. GAME STATE
+   ============================================================ */
 
-function navigateTo(pageId) {
-  document.querySelectorAll(".page-view").forEach(page => {
-    page.classList.add("hidden");
-  });
+let currentLanguage =
+  localStorage.getItem("inoculaLanguage") || "es";
 
-  document.querySelectorAll(".nav-btn").forEach(button => {
-    button.classList.remove("active");
-  });
-
-  const page = document.getElementById(pageId);
-
-  if (page) {
-    page.classList.remove("hidden");
-  }
-
-  const navMap = {
-    "page-home": 0,
-    "page-game": 1,
-    "page-lab": 2,
-    "page-leaderboard": 3
-  };
-
-  if (navMap[pageId] !== undefined) {
-    const buttons = document.querySelectorAll(".nav-btn");
-
-    if (buttons[navMap[pageId]]) {
-      buttons[navMap[pageId]].classList.add("active");
-    }
-  }
-}
-
-
-// ============================================================
-// 2. ESTADO DEL JUEGO
-// ============================================================
+let currentCharacter =
+  localStorage.getItem("inoculaCharacter") || "woman";
 
 let viralLoad = 15;
 let followers = 100;
 let shields = 1;
 
-// Posición TOTAL del jugador.
-// 0 = inicio
-// 5 = termina etapa 1
-// 10 = termina etapa 2
-// 15 = termina etapa 3
-// 20 = termina etapa 4
 let playerPosition = 0;
 
-const tilesPerStage = 5;
-const totalTiles = 20;
+const TOTAL_TILES = 24;
 
 let currentNews = null;
-let currentNewsIndex = 0;
+
+let usedNewsIndexes = [];
+
+let isMoving = false;
 
 
-// ============================================================
-// 3. NOTICIAS
-// ============================================================
+/* ============================================================
+   2. CHARACTER DATA
+   ============================================================ */
 
-const fakeNews = [
+const characters = {
+
+  woman: "👩🏻‍💻",
+
+  man: "👨🏻‍💻",
+
+  neutral: "🧑🏻‍💻"
+
+};
+
+
+/* ============================================================
+   3. STAGE DATA
+   ============================================================ */
+
+const stageData = {
+
+  1: {
+    icon: "🌅"
+  },
+
+  2: {
+    icon: "🏫"
+  },
+
+  3: {
+    icon: "📱"
+  },
+
+  4: {
+    icon: "🌙"
+  }
+
+};
+
+
+/* ============================================================
+   4. NEWS DATABASE
+   ============================================================ */
+
+const newsDatabase = [
+
+  /* =========================
+     SPANISH
+  ========================== */
 
   {
-    headline: "🚨 ¡Tomar agua con limón elimina TODAS las toxinas!",
-    article: "El agua con limón puede formar parte de una alimentación saludable, pero el cuerpo ya cuenta con órganos como el hígado y los riñones para eliminar sustancias de desecho.",
+    lang: "es",
+    headline:
+      "🚨 ¡Tomar agua con limón elimina TODAS las toxinas del cuerpo!",
+    article:
+      "El agua con limón puede formar parte de una alimentación saludable, pero el hígado y los riñones ya realizan funciones importantes para eliminar sustancias de desecho.",
     exaggerated: true
   },
 
   {
-    headline: "🧠 Las neuronas utilizan señales eléctricas para transmitir información",
-    article: "Las neuronas utilizan señales eléctricas y químicas para comunicarse y transmitir información dentro del sistema nervioso.",
+    lang: "es",
+    headline:
+      "🧠 Las neuronas utilizan señales eléctricas y químicas.",
+    article:
+      "Las neuronas transmiten información mediante señales eléctricas y sustancias químicas llamadas neurotransmisores.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Instagram puede leer directamente tus pensamientos!",
-    article: "Las plataformas digitales pueden recopilar información sobre actividad, intereses e interacciones, pero eso no significa que puedan leer directamente los pensamientos.",
+    lang: "es",
+    headline:
+      "🚨 ¡Instagram puede leer tus pensamientos!",
+    article:
+      "Las plataformas digitales pueden recopilar información sobre actividad, intereses e interacciones, pero esto no significa que puedan leer directamente los pensamientos.",
     exaggerated: true
   },
 
   {
-    headline: "🦠 Lavarse las manos ayuda a reducir la transmisión de microorganismos",
-    article: "La higiene de manos puede ayudar a reducir la transmisión de diferentes microorganismos y prevenir enfermedades.",
+    lang: "es",
+    headline:
+      "🧼 Lavarse las manos ayuda a reducir la transmisión de microorganismos.",
+    article:
+      "La higiene de manos puede ayudar a reducir la transmisión de diferentes microorganismos y enfermedades.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡La inteligencia artificial NUNCA se equivoca!",
-    article: "Los sistemas de inteligencia artificial pueden producir respuestas incorrectas o información inventada y necesitan verificación humana.",
+    lang: "es",
+    headline:
+      "🚨 ¡La inteligencia artificial NUNCA se equivoca!",
+    article:
+      "Los sistemas de inteligencia artificial pueden producir información incorrecta o inventada y sus resultados necesitan ser verificados.",
     exaggerated: true
   },
 
   {
-    headline: "🌳 Los árboles absorben dióxido de carbono durante la fotosíntesis",
-    article: "Las plantas absorben dióxido de carbono durante la fotosíntesis y utilizan esa materia para producir compuestos orgánicos.",
+    lang: "es",
+    headline:
+      "🌳 Los árboles absorben dióxido de carbono durante la fotosíntesis.",
+    article:
+      "Las plantas absorben dióxido de carbono durante la fotosíntesis y forman parte del ciclo natural del carbono.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Plantar UN árbol resolverá el cambio climático!",
-    article: "Los árboles pueden contribuir a la captura de carbono, pero enfrentar el cambio climático requiere múltiples acciones.",
+    lang: "es",
+    headline:
+      "🚨 ¡Plantar UN SOLO árbol solucionará el cambio climático!",
+    article:
+      "Los árboles pueden contribuir a la captura de carbono, pero el cambio climático requiere múltiples acciones y estrategias.",
     exaggerated: true
   },
 
   {
-    headline: "📱 Algunas aplicaciones pueden solicitar acceso a tu ubicación",
-    article: "Algunas aplicaciones solicitan permisos de ubicación para proporcionar determinadas funciones o servicios.",
+    lang: "es",
+    headline:
+      "📍 Algunas aplicaciones pueden solicitar acceso a tu ubicación.",
+    article:
+      "Dependiendo de los permisos otorgados, algunas aplicaciones pueden utilizar información de ubicación para ofrecer determinadas funciones.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Si una publicación tiene millones de likes, es definitivamente verdadera!",
-    article: "La cantidad de interacciones de una publicación no demuestra por sí misma que la información sea verdadera.",
+    lang: "es",
+    headline:
+      "🚨 ¡Si tiene millones de likes, definitivamente es verdad!",
+    article:
+      "La cantidad de interacciones de una publicación no demuestra por sí misma que la información sea verdadera.",
     exaggerated: true
   },
 
   {
-    headline: "🔎 Comparar varias fuentes puede ayudar a detectar información falsa",
-    article: "Contrastar información con diferentes fuentes confiables puede ayudar a identificar errores, contradicciones o información falsa.",
+    lang: "es",
+    headline:
+      "🔎 Comparar varias fuentes puede ayudar a detectar información falsa.",
+    article:
+      "Contrastar una afirmación con diferentes fuentes confiables puede ayudar a identificar errores o inconsistencias.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Dormir solamente 2 horas hace que tu cerebro sea más productivo!",
-    article: "Dormir muy poco puede afectar la atención, la memoria y otras funciones cognitivas.",
+    lang: "es",
+    headline:
+      "🚨 ¡Una foto en internet siempre demuestra que algo ocurrió!",
+    article:
+      "Una fotografía puede ser antigua, estar fuera de contexto o haber sido modificada. Es importante verificar su origen.",
     exaggerated: true
   },
 
   {
-    headline: "💧 El agua es necesaria para diferentes funciones del organismo",
-    article: "El agua participa en numerosos procesos fisiológicos y es necesaria para mantener una hidratación adecuada.",
+    lang: "es",
+    headline:
+      "📰 Leer solamente el titular puede dar una visión incompleta.",
+    article:
+      "El contenido completo de una noticia puede proporcionar información adicional que cambia o matiza lo que sugiere el titular.",
+    exaggerated: false
+  },
+
+
+  /* =========================
+     ENGLISH
+  ========================== */
+
+  {
+    lang: "en",
+    headline:
+      "🚨 Drinking lemon water removes ALL toxins from your body!",
+    article:
+      "Lemon water can be part of a healthy diet, but organs such as the liver and kidneys already perform important functions involved in removing waste products.",
+    exaggerated: true
+  },
+
+  {
+    lang: "en",
+    headline:
+      "🧠 Neurons communicate using electrical and chemical signals.",
+    article:
+      "Neurons transmit information through electrical signals and chemicals called neurotransmitters.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Los celulares causan automáticamente pérdida de memoria!",
-    article: "El uso de dispositivos puede relacionarse con hábitos de atención y sueño, pero no puede afirmarse que los celulares causen automáticamente pérdida de memoria.",
+    lang: "en",
+    headline:
+      "🚨 Instagram can READ YOUR THOUGHTS!",
+    article:
+      "Digital platforms can collect information about activity, interests, and interactions, but this does not mean they can directly read people's thoughts.",
     exaggerated: true
   },
 
   {
-    headline: "🌞 La radiación ultravioleta puede afectar la piel",
-    article: "La exposición excesiva a la radiación ultravioleta puede provocar daños en la piel, por lo que se recomienda protección adecuada.",
+    lang: "en",
+    headline:
+      "🧼 Washing your hands can help reduce the spread of microorganisms.",
+    article:
+      "Hand hygiene can help reduce the transmission of different microorganisms and diseases.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Una foto puede demostrar por sí sola que una noticia es verdadera!",
-    article: "Una fotografía puede estar fuera de contexto, editada o acompañar información diferente de la original.",
+    lang: "en",
+    headline:
+      "🚨 Artificial intelligence is NEVER wrong!",
+    article:
+      "Artificial intelligence systems can produce incorrect or fabricated information, so their outputs should be verified.",
     exaggerated: true
   },
 
   {
-    headline: "📰 Verificar la fecha de una noticia puede ayudar a entender su contexto",
-    article: "Revisar cuándo fue publicada una información puede ayudar a determinar si continúa siendo relevante y si se está compartiendo fuera de contexto.",
+    lang: "en",
+    headline:
+      "🌳 Trees absorb carbon dioxide during photosynthesis.",
+    article:
+      "Plants absorb carbon dioxide during photosynthesis and are part of the natural carbon cycle.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Todo video que parece real ocurrió exactamente como lo vemos!",
-    article: "Los videos pueden editarse, recortarse, manipularse o presentarse fuera de contexto.",
+    lang: "en",
+    headline:
+      "🚨 Planting ONE tree will solve climate change!",
+    article:
+      "Trees can contribute to carbon storage, but addressing climate change requires multiple actions and strategies.",
     exaggerated: true
   },
 
   {
-    headline: "🔐 Las contraseñas únicas pueden mejorar la seguridad de tus cuentas",
-    article: "Utilizar contraseñas diferentes para distintas cuentas puede reducir el impacto de una filtración de credenciales.",
+    lang: "en",
+    headline:
+      "📍 Some apps can request access to your location.",
+    article:
+      "Depending on the permissions granted, some applications can use location information to provide certain features.",
     exaggerated: false
   },
 
   {
-    headline: "🚨 ¡Compartir una noticia sin leerla completa NO tiene ningún riesgo!",
-    article: "Compartir información sin revisar su contenido puede contribuir a la propagación de información falsa o engañosa.",
+    lang: "en",
+    headline:
+      "🚨 If a post has millions of likes, it MUST be true!",
+    article:
+      "The number of likes or shares on a post does not by itself prove that the information is accurate.",
     exaggerated: true
   },
 
   {
-    headline: "📚 Leer más allá del titular ayuda a comprender mejor una noticia",
-    article: "Leer el contenido completo permite conocer el contexto y comparar lo que afirma el titular con la información presentada.",
+    lang: "en",
+    headline:
+      "🔎 Comparing multiple sources can help identify misinformation.",
+    article:
+      "Checking a claim against several reliable sources can help identify errors and inconsistencies.",
+    exaggerated: false
+  },
+
+  {
+    lang: "en",
+    headline:
+      "🚨 A photo online ALWAYS proves that something happened!",
+    article:
+      "A photograph can be old, taken out of context, or digitally modified. Its origin should be verified.",
+    exaggerated: true
+  },
+
+  {
+    lang: "en",
+    headline:
+      "📰 Reading only a headline can provide an incomplete picture.",
+    article:
+      "The full article may contain additional information that changes or adds context to what the headline suggests.",
+    exaggerated: false
+  },
+
+
+  /* =========================
+     CHINESE
+  ========================== */
+
+  {
+    lang: "zh",
+    headline:
+      "🚨 喝柠檬水可以清除身体里的所有毒素！",
+    article:
+      "柠檬水可以成为健康饮食的一部分，但肝脏和肾脏本身就承担着处理和排出废物的重要功能。",
+    exaggerated: true
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🧠 神经元通过电信号和化学信号传递信息。",
+    article:
+      "神经元通过电信号以及被称为神经递质的化学物质传递信息。",
+    exaggerated: false
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🚨 Instagram 可以读取你的思想！",
+    article:
+      "数字平台可以收集用户的活动、兴趣和互动信息，但这并不意味着它们可以直接读取人的思想。",
+    exaggerated: true
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🧼 洗手可以帮助减少微生物传播。",
+    article:
+      "保持手部卫生可以帮助减少不同微生物和疾病的传播。",
+    exaggerated: false
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🚨 人工智能永远不会犯错！",
+    article:
+      "人工智能系统可能产生错误或虚构的信息，因此其结果仍然需要验证。",
+    exaggerated: true
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🌳 树木在光合作用过程中吸收二氧化碳。",
+    article:
+      "植物在光合作用过程中吸收二氧化碳，并参与自然界的碳循环。",
+    exaggerated: false
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🚨 只种一棵树就可以解决气候变化！",
+    article:
+      "树木可以帮助储存碳，但解决气候变化需要多方面的行动和策略。",
+    exaggerated: true
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "📍 一些应用程序可以请求访问你的位置信息。",
+    article:
+      "根据用户授予的权限，一些应用程序可以使用位置信息来提供特定功能。",
+    exaggerated: false
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🚨 如果一条帖子有数百万个赞，它一定是真的！",
+    article:
+      "帖子获得的点赞或分享数量本身并不能证明其中的信息是真实的。",
+    exaggerated: true
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🔎 比较多个信息来源可以帮助识别虚假信息。",
+    article:
+      "将一个说法与多个可靠来源进行比较，可以帮助发现错误和不一致之处。",
+    exaggerated: false
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "🚨 网上照片一定能证明事情真的发生过！",
+    article:
+      "照片可能来自很久以前，也可能脱离原本的背景，甚至经过修改。因此需要验证照片来源。",
+    exaggerated: true
+  },
+
+  {
+    lang: "zh",
+    headline:
+      "📰 只阅读新闻标题可能会得到不完整的信息。",
+    article:
+      "完整文章可能包含更多背景和细节，从而改变或补充标题所表达的内容。",
     exaggerated: false
   }
 
 ];
 
 
-// ============================================================
-// 4. TRADUCCIONES
-// ============================================================
+/* ============================================================
+   5. TRANSLATIONS
+   ============================================================ */
 
 const translations = {
 
   es: {
-    nav: ["Inicio", "Tablero", "Laboratorio", "Ranking"],
 
-    heroTag: "UNESCO Youth Hackathon 2026",
+    navHome: "Inicio",
+    navBoard: "Tablero",
+    navLab: "Laboratorio",
+    navRanking: "Ranking",
 
-    heroTitle: 'Antes de creer, <span class="gradient-text">inocúlate.</span>',
+    heroTag:
+      "UNESCO Youth Hackathon 2026",
+
+    heroTitleOne:
+      "Antes de creer,",
+
+    heroTitleTwo:
+      "inocúlate.",
 
     heroText:
       "El tablero de vida digital que te entrena para detectar fake news, deepfakes y manipulación en tu día a día digital.",
 
-    enterBoard: "Entrar al Tablero",
-    tools: "Probar Herramientas",
+    enterBoard:
+      "Entrar al Tablero",
 
-    stages: "Etapas del Día",
-    languages: "Idiomas (ES, EN, ZH)",
-    viralGoal: "Carga Viral Meta",
+    tryTools:
+      "Probar Herramientas",
 
-    publicViral: "Carga Viral Pública",
-    lowVirus: "15% - Virus bajo control",
+    dayStages:
+      "Etapas del Día",
 
-    digitalProfile: "Perfil Digital",
-    followers: "Seguidores:",
-    shields: "Escudos:",
+    languages:
+      "Idiomas (ES, EN, ZH)",
 
-    digitalWheel: "Rueda Digital",
-    spin: "GIRAR RUEDA",
-    spinText: "Gira la Rueda",
+    viralTarget:
+      "Carga Viral Meta",
 
-    boardTitle: "Tablero: Tu Navegación Diaria",
+    viralLoad:
+      "Carga Viral Pública",
 
-    stage1: "Etapa 1: Despertar & Feed Matutino",
-    stage2: "Etapa 2: Trabajo / Escuela & Chats",
-    stage3: "Etapa 3: Tarde, Noticias & Redes",
-    stage4: "Etapa 4: Noche, Viral & Retiro Digital",
+    digitalProfile:
+      "Perfil Digital",
 
-    forkTitle: "¡Punto de Bifurcación! Elige tu camino:",
+    followers:
+      "Seguidores:",
 
-    verifier: "Camino Verificador",
-    verifierSmall: "Más lento, gana Escudos de protección",
+    shields:
+      "Escudos:",
 
-    fast: "Camino Rápido",
-    fastSmall: "Avanzas rápido, asumes riesgo de Fake News",
+    chooseCharacter:
+      "Elige tu personaje",
 
-    labTitle: "Laboratorio de Verificación",
+    woman:
+      "Mujer",
+
+    man:
+      "Hombre",
+
+    neutral:
+      "Neutral",
+
+    digitalWheel:
+      "Rueda Digital",
+
+    spin:
+      "GIRAR RUEDA",
+
+    spinText:
+      "Gira la Rueda",
+
+    digitalJourney:
+      "TU VIAJE DIGITAL",
+
+    boardTitle:
+      "Tablero: Tu Navegación Diaria",
+
+    currentStage:
+      "ETAPA ACTUAL",
+
+    stage1:
+      "Etapa 1: Despertar & Feed Matutino",
+
+    stage2:
+      "Etapa 2: Trabajo / Escuela & Chats",
+
+    stage3:
+      "Etapa 3: Tarde, Noticias & Redes",
+
+    stage4:
+      "Etapa 4: Noche, Viral & Retiro Digital",
+
+    forkTitle:
+      "¡Punto de Bifurcación! Elige tu camino:",
+
+    forkDescription:
+      "Cada decisión cambia tu viaje digital.",
+
+    verifier:
+      "Camino Verificador",
+
+    verifierSmall:
+      "Más lento, gana Escudos de protección",
+
+    fast:
+      "Camino Rápido",
+
+    fastSmall:
+      "Avanzas rápido, asumes riesgo de Fake News",
+
+    labTitle:
+      "Laboratorio de Verificación",
 
     labDescription:
-      "Simulador interactivo para analizar noticias antes de compartirlas:",
+      "Simulador interactivo para analizar noticias antes de compartirlas.",
 
-    scanAI: "Escanear IA",
-    source: "Buscar Fuente Original",
-    metadata: "Revisar Metadatos",
+    trending:
+      "🔥 EN TENDENCIA",
+
+    postedBy:
+      "Publicado hace 5 minutos",
+
+    scanAI:
+      "Escanear IA",
+
+    findSource:
+      "Buscar Fuente Original",
+
+    metadata:
+      "Revisar Metadatos",
 
     labOutput:
       "Selecciona una herramienta para inspeccionar el contenido.",
 
-    rankingTitle: "Agentes INOCULA Destacados",
+    rankingTitle:
+      "Agentes INOCULA Destacados",
 
-    position: "Posición",
-    agent: "Agente",
-    trustedFollowers: "Seguidores Confiables",
-    avoidedViral: "Carga Viral Evitada",
+    position:
+      "Posición",
 
-    challenge: "Reto: Titular vs Nota",
+    agent:
+      "Agente",
 
-    readArticle: "📄 Leer nota completa",
+    trustedFollowers:
+      "Seguidores Confiables",
 
-    slider: "¿El titular representa la nota o exagera?",
+    avoidedViral:
+      "Carga Viral Evitada",
 
-    confirm: "Confirmar Evaluación",
+    challenge:
+      "Reto: Titular vs Nota",
 
-    shield: "🛡️ Usar Escudo para Saltar",
+    readArticle:
+      "📄 Leer nota completa",
 
-    close: "Cerrar",
+    slider:
+      "¿El titular representa la nota o exagera?",
 
-    advance: "Avanzas",
-    squares: "casillas",
+    notExaggerated:
+      "Representa",
 
-    stageReached: "¡Llegaste a la siguiente etapa!",
+    exaggerated:
+      "Exagera",
 
-    final:
-      "🎉 ¡Completaste todas las etapas de INOCULA!"
+    confirm:
+      "Confirmar Evaluación",
+
+    shield:
+      "🛡️ Usar Escudo para Saltar",
+
+    close:
+      "Cerrar",
+
+    newStage:
+      "NUEVA ETAPA",
+
+    continue:
+      "Continuar",
+
+    advance:
+      "Avanzas",
+
+    spaces:
+      "casillas",
+
+    positionText:
+      "Posición",
+
+    stageText:
+      "Etapa",
+
+    start:
+      "¡Comienza tu navegación digital!",
+
+    challengeAlert:
+      "¡Nuevo reto digital!",
+
+    finish:
+      "🏆 ¡Llegaste al final del día digital!",
+
+    finishText:
+      "Has completado tu recorrido por INOCULA.",
+
+    verifierAlert:
+      "Tomaste el Camino Verificador: ganas +1 Escudo.",
+
+    fastAlert:
+      "Tomaste el Camino Rápido: ganas +30 Seguidores pero aumenta la Carga Viral.",
+
+    goodFake:
+      "¡Excelente! Detectaste que el titular exageraba la información.",
+
+    badFake:
+      "¡Cuidado! El titular exageraba la información.",
+
+    goodTrue:
+      "¡Excelente! Detectaste que el titular representa correctamente la información.",
+
+    badTrue:
+      "¡Cuidado! El titular sí representaba correctamente la información.",
+
+    shieldUsed:
+      "Usaste un Escudo para neutralizar la amenaza.",
+
+    noShield:
+      "No tienes Escudos suficientes."
+
   },
 
 
   en: {
 
-    nav: ["Home", "Game Board", "Laboratory", "Leaderboard"],
+    navHome:
+      "Home",
 
-    heroTag: "UNESCO Youth Hackathon 2026",
+    navBoard:
+      "Game Board",
 
-    heroTitle:
-      'Before you believe, <span class="gradient-text">inoculate yourself.</span>',
+    navLab:
+      "Laboratory",
+
+    navRanking:
+      "Leaderboard",
+
+    heroTag:
+      "UNESCO Youth Hackathon 2026",
+
+    heroTitleOne:
+      "Before you believe,",
+
+    heroTitleTwo:
+      "inoculate yourself.",
 
     heroText:
       "The digital life board that trains you to detect fake news, deepfakes, and manipulation in your everyday digital life.",
 
-    enterBoard: "Enter Game Board",
-    tools: "Try Tools",
+    enterBoard:
+      "Enter Game Board",
 
-    stages: "Stages of the Day",
-    languages: "Languages (ES, EN, ZH)",
-    viralGoal: "Target Viral Load",
+    tryTools:
+      "Try Tools",
 
-    publicViral: "Public Viral Load",
-    lowVirus: "15% - Virus under control",
+    dayStages:
+      "Stages of the Day",
 
-    digitalProfile: "Digital Profile",
-    followers: "Followers:",
-    shields: "Shields:",
+    languages:
+      "Languages (ES, EN, ZH)",
 
-    digitalWheel: "Digital Wheel",
-    spin: "SPIN WHEEL",
-    spinText: "Spin the Wheel",
+    viralTarget:
+      "Target Viral Load",
 
-    boardTitle: "Game Board: Your Daily Navigation",
+    viralLoad:
+      "Public Viral Load",
 
-    stage1: "Stage 1: Wake Up & Morning Feed",
-    stage2: "Stage 2: Work / School & Chats",
-    stage3: "Stage 3: Afternoon, News & Social Media",
-    stage4: "Stage 4: Night, Viral & Digital Detox",
+    digitalProfile:
+      "Digital Profile",
 
-    forkTitle: "Fork in the Road! Choose your path:",
+    followers:
+      "Followers:",
 
-    verifier: "Verifier Path",
-    verifierSmall: "Slower, earns protection Shields",
+    shields:
+      "Shields:",
 
-    fast: "Fast Path",
-    fastSmall: "Move faster, take Fake News risk",
+    chooseCharacter:
+      "Choose your character",
 
-    labTitle: "Verification Laboratory",
+    woman:
+      "Woman",
+
+    man:
+      "Man",
+
+    neutral:
+      "Neutral",
+
+    digitalWheel:
+      "Digital Wheel",
+
+    spin:
+      "SPIN WHEEL",
+
+    spinText:
+      "Spin the Wheel",
+
+    digitalJourney:
+      "YOUR DIGITAL JOURNEY",
+
+    boardTitle:
+      "Game Board: Your Daily Navigation",
+
+    currentStage:
+      "CURRENT STAGE",
+
+    stage1:
+      "Stage 1: Wake Up & Morning Feed",
+
+    stage2:
+      "Stage 2: Work / School & Chats",
+
+    stage3:
+      "Stage 3: Afternoon, News & Social Media",
+
+    stage4:
+      "Stage 4: Night, Viral & Digital Detox",
+
+    forkTitle:
+      "Fork in the Road! Choose your path:",
+
+    forkDescription:
+      "Every decision changes your digital journey.",
+
+    verifier:
+      "Verifier Path",
+
+    verifierSmall:
+      "Slower, earns protection Shields",
+
+    fast:
+      "Fast Path",
+
+    fastSmall:
+      "Move faster, take Fake News risk",
+
+    labTitle:
+      "Verification Laboratory",
 
     labDescription:
-      "Interactive simulator to analyze news before sharing it:",
+      "Interactive simulator to analyze news before sharing it.",
 
-    scanAI: "Scan with AI",
-    source: "Find Original Source",
-    metadata: "Review Metadata",
+    trending:
+      "🔥 TRENDING",
+
+    postedBy:
+      "Posted 5 minutes ago",
+
+    scanAI:
+      "Scan with AI",
+
+    findSource:
+      "Find Original Source",
+
+    metadata:
+      "Review Metadata",
 
     labOutput:
       "Select a tool to inspect the content.",
 
-    rankingTitle: "Featured INOCULA Agents",
+    rankingTitle:
+      "Featured INOCULA Agents",
 
-    position: "Position",
-    agent: "Agent",
-    trustedFollowers: "Trusted Followers",
-    avoidedViral: "Viral Load Avoided",
+    position:
+      "Position",
 
-    challenge: "Challenge: Headline vs Article",
+    agent:
+      "Agent",
 
-    readArticle: "📄 Read full article",
+    trustedFollowers:
+      "Trusted Followers",
+
+    avoidedViral:
+      "Viral Load Avoided",
+
+    challenge:
+      "Challenge: Headline vs Article",
+
+    readArticle:
+      "📄 Read full article",
 
     slider:
       "Does the headline represent the article or exaggerate?",
 
-    confirm: "Confirm Evaluation",
+    notExaggerated:
+      "Represents",
 
-    shield: "🛡️ Use Shield to Skip",
+    exaggerated:
+      "Exaggerates",
 
-    close: "Close",
+    confirm:
+      "Confirm Evaluation",
 
-    advance: "You advance",
+    shield:
+      "🛡️ Use Shield to Skip",
 
-    squares: "squares",
+    close:
+      "Close",
 
-    stageReached: "You reached the next stage!",
+    newStage:
+      "NEW STAGE",
 
-    final:
-      "🎉 You completed all INOCULA stages!"
+    continue:
+      "Continue",
+
+    advance:
+      "You advanced",
+
+    spaces:
+      "spaces",
+
+    positionText:
+      "Position",
+
+    stageText:
+      "Stage",
+
+    start:
+      "Start your digital journey!",
+
+    challengeAlert:
+      "New digital challenge!",
+
+    finish:
+      "🏆 You reached the end of your digital day!",
+
+    finishText:
+      "You completed your INOCULA journey.",
+
+    verifierAlert:
+      "You chose the Verifier Path: +1 Shield.",
+
+    fastAlert:
+      "You chose the Fast Path: +30 Followers, but Viral Load increased.",
+
+    goodFake:
+      "Excellent! You detected that the headline exaggerated the information.",
+
+    badFake:
+      "Careful! The headline exaggerated the information.",
+
+    goodTrue:
+      "Excellent! You detected that the headline accurately represented the information.",
+
+    badTrue:
+      "Careful! The headline accurately represented the information.",
+
+    shieldUsed:
+      "You used a Shield to neutralize the threat.",
+
+    noShield:
+      "You do not have enough Shields."
+
   },
 
 
   zh: {
 
-    nav: ["首页", "游戏板", "实验室", "排行榜"],
+    navHome:
+      "首页",
 
-    heroTag: "联合国教科文组织青年黑客马拉松 2026",
+    navBoard:
+      "游戏板",
 
-    heroTitle:
-      '在相信之前，<span class="gradient-text">先给自己接种。</span>',
+    navLab:
+      "实验室",
+
+    navRanking:
+      "排行榜",
+
+    heroTag:
+      "联合国教科文组织青年黑客马拉松 2026",
+
+    heroTitleOne:
+      "在相信之前，",
+
+    heroTitleTwo:
+      "先给自己接种。",
 
     heroText:
       "数字生活棋盘，训练你识别日常数字生活中的假新闻、深度伪造和信息操纵。",
 
-    enterBoard: "进入游戏板",
-    tools: "尝试工具",
+    enterBoard:
+      "进入游戏板",
 
-    stages: "一天的阶段",
-    languages: "语言（ES、EN、ZH）",
-    viralGoal: "目标病毒负荷",
+    tryTools:
+      "尝试工具",
 
-    publicViral: "公共病毒负荷",
-    lowVirus: "15% - 病毒处于控制之下",
+    dayStages:
+      "一天的阶段",
 
-    digitalProfile: "数字档案",
-    followers: "关注者：",
-    shields: "护盾：",
+    languages:
+      "语言（ES、EN、ZH）",
 
-    digitalWheel: "数字转盘",
-    spin: "旋转转盘",
-    spinText: "旋转转盘",
+    viralTarget:
+      "目标病毒负荷",
 
-    boardTitle: "游戏板：你的日常数字生活",
+    viralLoad:
+      "公共病毒负荷",
 
-    stage1: "阶段 1：起床与早晨信息流",
-    stage2: "阶段 2：工作 / 学校与聊天",
-    stage3: "阶段 3：下午、新闻与社交网络",
-    stage4: "阶段 4：夜晚、病毒信息与数字休息",
+    digitalProfile:
+      "数字档案",
 
-    forkTitle: "分岔路口！选择你的道路：",
+    followers:
+      "关注者：",
 
-    verifier: "验证者道路",
-    verifierSmall: "速度较慢，但可以获得保护护盾",
+    shields:
+      "护盾：",
 
-    fast: "快速道路",
-    fastSmall: "前进更快，但承担假新闻风险",
+    chooseCharacter:
+      "选择你的角色",
 
-    labTitle: "信息验证实验室",
+    woman:
+      "女性",
+
+    man:
+      "男性",
+
+    neutral:
+      "中性",
+
+    digitalWheel:
+      "数字转盘",
+
+    spin:
+      "旋转转盘",
+
+    spinText:
+      "旋转转盘",
+
+    digitalJourney:
+      "你的数字旅程",
+
+    boardTitle:
+      "游戏板：你的日常数字生活",
+
+    currentStage:
+      "当前阶段",
+
+    stage1:
+      "阶段 1：起床与早晨信息流",
+
+    stage2:
+      "阶段 2：工作 / 学校与聊天",
+
+    stage3:
+      "阶段 3：下午、新闻与社交网络",
+
+    stage4:
+      "阶段 4：夜晚、病毒信息与数字休息",
+
+    forkTitle:
+      "分岔路口！选择你的道路：",
+
+    forkDescription:
+      "每一个决定都会改变你的数字旅程。",
+
+    verifier:
+      "验证者道路",
+
+    verifierSmall:
+      "速度较慢，但可以获得保护护盾",
+
+    fast:
+      "快速道路",
+
+    fastSmall:
+      "前进更快，但承担假新闻风险",
+
+    labTitle:
+      "信息验证实验室",
 
     labDescription:
-      "在分享新闻之前进行分析的互动模拟器：",
+      "在分享新闻之前进行分析的互动模拟器。",
 
-    scanAI: "AI 扫描",
-    source: "查找原始来源",
-    metadata: "检查元数据",
+    trending:
+      "🔥 热门内容",
+
+    postedBy:
+      "发布于 5 分钟前",
+
+    scanAI:
+      "AI 扫描",
+
+    findSource:
+      "查找原始来源",
+
+    metadata:
+      "检查元数据",
 
     labOutput:
       "选择一个工具来检查内容。",
 
-    rankingTitle: "INOCULA 优秀特工",
+    rankingTitle:
+      "INOCULA 优秀特工",
 
-    position: "排名",
-    agent: "特工",
-    trustedFollowers: "可信关注者",
-    avoidedViral: "避免的病毒负荷",
+    position:
+      "排名",
 
-    challenge: "挑战：标题与文章",
+    agent:
+      "特工",
 
-    readArticle: "📄 阅读完整文章",
+    trustedFollowers:
+      "可信关注者",
+
+    avoidedViral:
+      "避免的病毒负荷",
+
+    challenge:
+      "挑战：标题与文章",
+
+    readArticle:
+      "📄 阅读完整文章",
 
     slider:
       "标题是否准确反映文章内容，还是夸大了？",
 
-    confirm: "确认评估",
+    notExaggerated:
+      "准确",
 
-    shield: "🛡️ 使用护盾跳过",
+    exaggerated:
+      "夸大",
 
-    close: "关闭",
+    confirm:
+      "确认评估",
 
-    advance: "前进",
+    shield:
+      "🛡️ 使用护盾跳过",
 
-    squares: "格",
+    close:
+      "关闭",
 
-    stageReached: "你到达了下一个阶段！",
+    newStage:
+      "新阶段",
 
-    final:
-      "🎉 你完成了 INOCULA 的所有阶段！"
+    continue:
+      "继续",
+
+    advance:
+      "你前进了",
+
+    spaces:
+      "格",
+
+    positionText:
+      "位置",
+
+    stageText:
+      "阶段",
+
+    start:
+      "开始你的数字生活之旅！",
+
+    challengeAlert:
+      "新的数字挑战！",
+
+    finish:
+      "🏆 你到达了数字生活的一天终点！",
+
+    finishText:
+      "你完成了 INOCULA 的游戏旅程。",
+
+    verifierAlert:
+      "你选择了验证者道路：获得 +1 护盾。",
+
+    fastAlert:
+      "你选择了快速道路：获得 +30 关注者，但病毒负荷增加。",
+
+    goodFake:
+      "太棒了！你发现标题夸大了信息。",
+
+    badFake:
+      "注意！这个标题夸大了信息。",
+
+    goodTrue:
+      "太棒了！你发现标题准确地反映了信息。",
+
+    badTrue:
+      "注意！这个标题准确地反映了信息。",
+
+    shieldUsed:
+      "你使用了护盾来抵御威胁。",
+
+    noShield:
+      "你没有足够的护盾。"
+
   }
 
 };
 
 
-// ============================================================
-// 5. IDIOMA ACTUAL
-// ============================================================
+/* ============================================================
+   6. NAVIGATION
+   ============================================================ */
 
-let currentLanguage = "es";
+function navigateTo(pageId) {
+
+  document
+    .querySelectorAll(".page-view")
+    .forEach(page => {
+
+      page.classList.add("hidden");
+      page.classList.remove("active");
+
+    });
 
 
-// ============================================================
-// 6. RUEDA
-// ============================================================
+  const target =
+    document.getElementById(pageId);
+
+  if (!target) return;
+
+
+  target.classList.remove("hidden");
+  target.classList.add("active");
+
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+      button.classList.remove("active");
+
+    });
+
+
+  const activeButton =
+    document.querySelector(
+      `.nav-btn[data-page="${pageId}"]`
+    );
+
+  if (activeButton) {
+    activeButton.classList.add("active");
+  }
+
+}
+
+
+/* ============================================================
+   7. TRANSLATE ALL PAGE
+   ============================================================ */
+
+function changeLanguage(lang) {
+
+  if (!translations[lang]) {
+    lang = "es";
+  }
+
+  currentLanguage = lang;
+
+  localStorage.setItem(
+    "inoculaLanguage",
+    lang
+  );
+
+  document.documentElement.lang = lang;
+
+  const dictionary =
+    translations[lang];
+
+
+  /*
+   * Every element with data-i18n
+   */
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(element => {
+
+      const key =
+        element.dataset.i18n;
+
+      if (
+        dictionary[key] !== undefined
+      ) {
+
+        element.textContent =
+          dictionary[key];
+
+      }
+
+    });
+
+
+  /*
+   * Language selector
+   */
+
+  const selector =
+    document.getElementById("lang-select");
+
+  if (selector) {
+    selector.value = lang;
+  }
+
+
+  /*
+   * Update dynamic game elements
+   */
+
+  updateHUD();
+
+  updatePositionIndicator();
+
+  updateCurrentStage();
+
+  updateLabNews();
+
+  updateWheelLanguage();
+
+
+  /*
+   * If a challenge is open,
+   * refresh its content.
+   */
+
+  if (currentNews) {
+
+    const translatedNews =
+      getEquivalentNews(currentNews);
+
+    if (translatedNews) {
+
+      currentNews =
+        translatedNews;
+
+      renderCurrentNews();
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   8. FIND EQUIVALENT NEWS
+   ============================================================ */
+
+function getEquivalentNews(news) {
+
+  const sameLanguage =
+    newsDatabase.filter(
+      item =>
+        item.lang === currentLanguage
+    );
+
+  const allSpanish =
+    newsDatabase.filter(
+      item =>
+        item.lang === "es"
+    );
+
+  const topicIndex =
+    allSpanish.findIndex(
+      item =>
+        item.headline ===
+        getSpanishHeadline(news)
+    );
+
+
+  if (
+    topicIndex >= 0 &&
+    sameLanguage[topicIndex]
+  ) {
+
+    return sameLanguage[topicIndex];
+
+  }
+
+
+  return sameLanguage[0] || null;
+
+}
+
+
+/*
+ * Find the Spanish version of a topic.
+ */
+
+function getSpanishHeadline(news) {
+
+  const currentLanguageNews =
+    newsDatabase.filter(
+      item =>
+        item.lang === news.lang
+    );
+
+  const index =
+    currentLanguageNews.findIndex(
+      item =>
+        item.headline === news.headline
+    );
+
+  const spanishNews =
+    newsDatabase.filter(
+      item =>
+        item.lang === "es"
+    );
+
+  return spanishNews[index]
+    ? spanishNews[index].headline
+    : news.headline;
+
+}
+
+
+/* ============================================================
+   9. CREATE BOARD
+   ============================================================ */
+
+function createBoard() {
+
+  const stages = [
+
+    document.getElementById("stage-1"),
+    document.getElementById("stage-2"),
+    document.getElementById("stage-3"),
+    document.getElementById("stage-4")
+
+  ];
+
+
+  let tileNumber = 0;
+
+
+  stages.forEach(stage => {
+
+    if (!stage) return;
+
+    stage.innerHTML = "";
+
+
+    for (let i = 0; i < 6; i++) {
+
+      const tile =
+        document.createElement("div");
+
+      tile.className =
+        "game-tile";
+
+      tile.dataset.position =
+        tileNumber;
+
+
+      tile.textContent =
+        tileNumber + 1;
+
+
+      stage.appendChild(tile);
+
+
+      tileNumber++;
+
+    }
+
+  });
+
+
+  updatePlayerPosition();
+
+}
+
+
+/* ============================================================
+   10. PLAYER POSITION
+   ============================================================ */
+
+function updatePlayerPosition() {
+
+  document
+    .querySelectorAll(".game-tile")
+    .forEach(tile => {
+
+      tile.classList.remove(
+        "player-position"
+      );
+
+      tile.classList.remove(
+        "visited"
+      );
+
+      const oldPlayer =
+        tile.querySelector(
+          ".player-token"
+        );
+
+      if (oldPlayer) {
+        oldPlayer.remove();
+      }
+
+    });
+
+
+  /*
+   * Mark previous spaces
+   */
+
+  document
+    .querySelectorAll(".game-tile")
+    .forEach(tile => {
+
+      const position =
+        Number(tile.dataset.position);
+
+      if (
+        position <
+        playerPosition
+      ) {
+
+        tile.classList.add(
+          "visited"
+        );
+
+      }
+
+    });
+
+
+  /*
+   * Find current tile
+   */
+
+  const currentTile =
+    document.querySelector(
+      `.game-tile[data-position="${playerPosition}"]`
+    );
+
+
+  if (!currentTile) return;
+
+
+  currentTile.classList.add(
+    "player-position"
+  );
+
+
+  const player =
+    document.createElement("div");
+
+  player.className =
+    "player-token";
+
+  player.textContent =
+    characters[currentCharacter];
+
+
+  currentTile.appendChild(player);
+
+
+  updatePositionIndicator();
+
+  updateCurrentStage();
+
+}
+
+
+/* ============================================================
+   11. CHARACTER
+   ============================================================ */
+
+function chooseCharacter(character) {
+
+  if (!characters[character]) {
+    return;
+  }
+
+  currentCharacter =
+    character;
+
+  localStorage.setItem(
+    "inoculaCharacter",
+    character
+  );
+
+
+  document
+    .querySelectorAll(".character-option")
+    .forEach(button => {
+
+      button.classList.remove(
+        "active"
+      );
+
+    });
+
+
+  const selected =
+    document.querySelector(
+      `.character-option[data-character="${character}"]`
+    );
+
+
+  if (selected) {
+    selected.classList.add("active");
+  }
+
+
+  updatePlayerPosition();
+
+}
+
+
+/* ============================================================
+   12. CURRENT STAGE
+   ============================================================ */
+
+function getCurrentStageNumber() {
+
+  if (playerPosition < 6) {
+    return 1;
+  }
+
+  if (playerPosition < 12) {
+    return 2;
+  }
+
+  if (playerPosition < 18) {
+    return 3;
+  }
+
+  return 4;
+
+}
+
+
+function getStageName(number) {
+
+  const names = {
+
+    1: "morning",
+    2: "work",
+    3: "afternoon",
+    4: "night"
+
+  };
+
+  return names[number];
+
+}
+
+
+/* ============================================================
+   13. UPDATE CURRENT STAGE
+   ============================================================ */
+
+function updateCurrentStage() {
+
+  const stageNumber =
+    getCurrentStageNumber();
+
+
+  document
+    .querySelectorAll(".day-stage")
+    .forEach(stage => {
+
+      stage.classList.remove(
+        "current-stage"
+      );
+
+    });
+
+
+  const currentStage =
+    document.querySelector(
+      `.day-stage[data-stage="${stageNumber}"]`
+    );
+
+
+  if (currentStage) {
+
+    currentStage.classList.add(
+      "current-stage"
+    );
+
+  }
+
+
+  const dictionary =
+    translations[currentLanguage];
+
+
+  const stageKey =
+    `stage${stageNumber}`;
+
+
+  const currentStageName =
+    document.getElementById(
+      "current-stage-name"
+    );
+
+
+  if (currentStageName) {
+
+    currentStageName.textContent =
+      dictionary[stageKey];
+
+  }
+
+
+  const icon =
+    document.getElementById(
+      "stage-banner-icon"
+    );
+
+
+  if (icon) {
+
+    icon.textContent =
+      stageData[stageNumber].icon;
+
+  }
+
+
+  /*
+   * Progress
+   */
+
+  const progressText =
+    document.getElementById(
+      "stage-progress-text"
+    );
+
+  const progressFill =
+    document.getElementById(
+      "stage-progress-fill"
+    );
+
+
+  if (progressText) {
+
+    progressText.textContent =
+      `${stageNumber} / 4`;
+
+  }
+
+
+  if (progressFill) {
+
+    progressFill.style.width =
+      `${stageNumber * 25}%`;
+
+  }
+
+}
+
+
+/* ============================================================
+   14. POSITION INDICATOR
+   ============================================================ */
+
+function updatePositionIndicator() {
+
+  const dictionary =
+    translations[currentLanguage];
+
+  const wheel =
+    document.getElementById(
+      "wheel-display"
+    );
+
+
+  if (!wheel) return;
+
+
+  wheel.textContent =
+    `${dictionary.positionText}: ${playerPosition + 1}/${TOTAL_TILES}\n` +
+    `${dictionary.stageText}: ${getCurrentStageNumber()}`;
+
+}
+
+
+/* ============================================================
+   15. WHEEL LANGUAGE
+   ============================================================ */
+
+function updateWheelLanguage() {
+
+  if (isMoving) return;
+
+  const wheel =
+    document.getElementById(
+      "wheel-display"
+    );
+
+  if (!wheel) return;
+
+
+  /*
+   * Keep current position visible
+   */
+
+  updatePositionIndicator();
+
+}
+
+
+/* ============================================================
+   16. SPIN WHEEL
+   ============================================================ */
 
 function spinWheel() {
 
-  const spinButton = document.getElementById("spin-btn");
-
-  // Evita hacer varios giros simultáneamente
-  if (spinButton) {
-    spinButton.disabled = true;
+  if (isMoving) {
+    return;
   }
 
-  // Número aleatorio de casillas
-  const moves = Math.floor(Math.random() * 4) + 1;
 
-  const t = translations[currentLanguage];
+  /*
+   * If already finished
+   */
 
-  const wheelDisplay = document.getElementById("wheel-display");
+  if (
+    playerPosition >=
+    TOTAL_TILES - 1
+  ) {
 
-  if (wheelDisplay) {
+    return;
 
-    wheelDisplay.innerHTML =
-      `<strong>${t.advance} ${moves} ${t.squares}</strong>`;
   }
 
-  // Esperar un poquito para que se sienta como juego
+
+  isMoving = true;
+
+
+  const button =
+    document.getElementById(
+      "spin-btn"
+    );
+
+
+  if (button) {
+    button.disabled = true;
+  }
+
+
+  const moves =
+    Math.floor(
+      Math.random() * 4
+    ) + 1;
+
+
+  const dictionary =
+    translations[currentLanguage];
+
+
+  const wheel =
+    document.getElementById(
+      "wheel-display"
+    );
+
+
+  if (wheel) {
+
+    wheel.textContent =
+      `${dictionary.advance} ${moves} ${dictionary.spaces}`;
+
+  }
+
+
+  /*
+   * Move visually one tile at a time.
+   */
+
+  movePlayerStepByStep(
+    moves
+  );
+
+}
+
+
+/* ============================================================
+   17. MOVE STEP BY STEP
+   ============================================================ */
+
+function movePlayerStepByStep(
+  remainingMoves
+) {
+
+  if (
+    remainingMoves <= 0 ||
+    playerPosition >= TOTAL_TILES - 1
+  ) {
+
+    finishMovement();
+
+    return;
+
+  }
+
+
   setTimeout(() => {
 
-    movePlayer(moves);
+    const previousStage =
+      getCurrentStageNumber();
 
-    openMinigame("clickbait");
 
-    if (spinButton) {
-      spinButton.disabled = false;
+    playerPosition++;
+
+
+    updatePlayerPosition();
+
+
+    const newStage =
+      getCurrentStageNumber();
+
+
+    /*
+     * Stage changed.
+     */
+
+    if (
+      newStage !==
+      previousStage
+    ) {
+
+      showStageTransition(
+        newStage
+      );
+
+      /*
+       * Stop movement until user
+       * presses Continue.
+       */
+
+      window.pendingMoves =
+        remainingMoves - 1;
+
+      window.pendingMovement =
+        true;
+
+      return;
+
     }
 
-  }, 700);
+
+    movePlayerStepByStep(
+      remainingMoves - 1
+    );
+
+  }, 450);
+
 }
 
 
-// ============================================================
-// 7. MOVER AL JUGADOR
-// ============================================================
+/* ============================================================
+   18. CONTINUE AFTER STAGE
+   ============================================================ */
 
-function movePlayer(moves) {
+function closeStageTransition() {
 
-  const oldPosition = playerPosition;
+  const modal =
+    document.getElementById(
+      "stage-transition"
+    );
 
-  playerPosition += moves;
 
-  // No puede superar las 20 casillas
-  if (playerPosition > totalTiles) {
-    playerPosition = totalTiles;
+  if (modal) {
+    modal.classList.add("hidden");
   }
 
-  // Actualizar tablero
-  renderBoard();
 
-  // Detectar si cruzó a otra etapa
-  const oldStage = Math.floor(oldPosition / tilesPerStage);
-  const newStage = Math.floor(playerPosition / tilesPerStage);
+  if (
+    window.pendingMovement
+  ) {
 
-  if (newStage > oldStage && playerPosition < totalTiles) {
+    window.pendingMovement =
+      false;
 
-    const t = translations[currentLanguage];
+
+    const remaining =
+      window.pendingMoves || 0;
+
+
+    window.pendingMoves =
+      0;
+
+
+    if (remaining > 0) {
+
+      movePlayerStepByStep(
+        remaining
+      );
+
+    } else {
+
+      finishMovement();
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   19. SHOW STAGE TRANSITION
+   ============================================================ */
+
+function showStageTransition(
+  stageNumber
+) {
+
+  const dictionary =
+    translations[currentLanguage];
+
+
+  const modal =
+    document.getElementById(
+      "stage-transition"
+    );
+
+
+  const icon =
+    document.getElementById(
+      "transition-icon"
+    );
+
+
+  const title =
+    document.getElementById(
+      "transition-title"
+    );
+
+
+  const description =
+    document.getElementById(
+      "transition-description"
+    );
+
+
+  if (!modal) return;
+
+
+  icon.textContent =
+    stageData[stageNumber].icon;
+
+
+  title.textContent =
+    dictionary[
+      `stage${stageNumber}`
+    ];
+
+
+  const descriptions = {
+
+    es: {
+      1: "Comienza tu día digital.",
+      2: "Ahora entras en tu etapa de trabajo, escuela y conversaciones.",
+      3: "Las noticias y redes comienzan a influir en tu recorrido.",
+      4: "Llegaste a la noche. Es momento de cerrar tu día digital."
+    },
+
+    en: {
+      1: "Start your digital day.",
+      2: "Now you enter your work, school and conversation stage.",
+      3: "News and social media begin to shape your journey.",
+      4: "You reached the night. It is time to close your digital day."
+    },
+
+    zh: {
+      1: "开始你的数字生活。",
+      2: "现在进入工作、学校和聊天阶段。",
+      3: "新闻和社交媒体开始影响你的数字旅程。",
+      4: "你已经到达夜晚，是时候结束今天的数字生活了。"
+    }
+
+  };
+
+
+  description.textContent =
+    descriptions[
+      currentLanguage
+    ][stageNumber];
+
+
+  modal.classList.remove(
+    "hidden"
+  );
+
+}
+
+
+/* ============================================================
+   20. FINISH MOVEMENT
+   ============================================================ */
+
+function finishMovement() {
+
+  isMoving = false;
+
+
+  const button =
+    document.getElementById(
+      "spin-btn"
+    );
+
+
+  if (button) {
+    button.disabled = false;
+  }
+
+
+  const dictionary =
+    translations[currentLanguage];
+
+
+  /*
+   * Final tile
+   */
+
+  if (
+    playerPosition >=
+    TOTAL_TILES - 1
+  ) {
 
     setTimeout(() => {
-      alert(`🎉 ${t.stageReached}`);
+
+      alert(
+        `${dictionary.finish}\n\n${dictionary.finishText}`
+      );
+
     }, 300);
+
+    return;
+
   }
 
-  // Llegó al final
-  if (playerPosition >= totalTiles) {
 
-    const t = translations[currentLanguage];
+  /*
+   * Open challenge
+   */
 
-    setTimeout(() => {
-      alert(t.final);
-    }, 300);
-  }
+  setTimeout(() => {
+
+    openMinigame(
+      "clickbait"
+    );
+
+  }, 350);
+
 }
 
 
-// ============================================================
-// 8. DIBUJAR LAS CASILLAS Y EL JUGADOR
-// ============================================================
+/* ============================================================
+   21. NEWS
+   ============================================================ */
 
-function renderBoard() {
+function getNewsForCurrentLanguage() {
 
-  // Limpiar las cuatro etapas
-  for (let i = 1; i <= 4; i++) {
+  return newsDatabase.filter(
+    news =>
+      news.lang ===
+      currentLanguage
+  );
 
-    const container = document.getElementById(`stage-${i}`);
-
-    if (container) {
-      container.innerHTML = "";
-    }
-  }
-
-  // Crear 5 casillas por etapa
-  for (let stage = 1; stage <= 4; stage++) {
-
-    const container = document.getElementById(`stage-${stage}`);
-
-    if (!container) continue;
-
-    for (let tile = 1; tile <= 5; tile++) {
-
-      const tileNumber =
-        ((stage - 1) * tilesPerStage) + tile;
-
-      const tileElement = document.createElement("div");
-
-      tileElement.className = "game-tile";
-
-      tileElement.dataset.position = tileNumber;
-
-      tileElement.innerHTML =
-        `<span>${tileNumber}</span>`;
-
-      // Casilla actual
-      if (playerPosition === tileNumber) {
-
-        tileElement.classList.add("player-tile");
-
-        tileElement.innerHTML =
-          `<span>🧑‍💻</span>`;
-      }
-
-      // Casillas ya recorridas
-      if (tileNumber < playerPosition) {
-        tileElement.classList.add("visited-tile");
-      }
-
-      container.appendChild(tileElement);
-    }
-  }
 }
 
 
-// ============================================================
-// 9. MINIJUEGO DE NOTICIAS
-// ============================================================
+function getRandomNews() {
+
+  const available =
+    getNewsForCurrentLanguage();
+
+
+  if (
+    available.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    usedNewsIndexes.length >=
+    available.length
+  ) {
+
+    usedNewsIndexes = [];
+
+  }
+
+
+  let randomIndex;
+
+
+  do {
+
+    randomIndex =
+      Math.floor(
+        Math.random() *
+        available.length
+      );
+
+  } while (
+    usedNewsIndexes.includes(
+      randomIndex
+    ) &&
+    available.length > 1
+  );
+
+
+  usedNewsIndexes.push(
+    randomIndex
+  );
+
+
+  return available[
+    randomIndex
+  ];
+
+}
+
+
+/* ============================================================
+   22. OPEN MINIGAME
+   ============================================================ */
 
 function openMinigame(type) {
 
   const modal =
-    document.getElementById("interactive-modal");
+    document.getElementById(
+      "interactive-modal"
+    );
+
 
   if (!modal) return;
 
-  modal.classList.remove("hidden");
 
-  document.querySelectorAll(".minigame-view").forEach(game => {
-    game.classList.add("hidden");
-  });
+  if (
+    type === "clickbait"
+  ) {
 
-  if (type === "clickbait") {
-
-    // Elegir la siguiente noticia
     currentNews =
-      fakeNews[currentNewsIndex];
+      getRandomNews();
 
-    // Avanzar índice
-    currentNewsIndex++;
 
-    // Volver al inicio cuando se terminan
-    if (currentNewsIndex >= fakeNews.length) {
-      currentNewsIndex = 0;
-    }
+    renderCurrentNews();
 
-    // Mostrar titular
-    const headline =
-      document.querySelector(
-        "#minigame-clickbait .headline"
-      );
-
-    if (headline) {
-      headline.textContent =
-        currentNews.headline;
-    }
-
-    // Mostrar artículo
-    const article =
-      document.getElementById("article-body");
-
-    if (article) {
-
-      article.textContent =
-        currentNews.article;
-
-      article.classList.add("hidden");
-    }
-
-    // Reiniciar slider
-    const slider =
-      document.getElementById("clickbait-slider");
-
-    if (slider) {
-      slider.value = 50;
-    }
-
-    // Mostrar minijuego
-    const game =
-      document.getElementById("minigame-clickbait");
-
-    if (game) {
-      game.classList.remove("hidden");
-    }
   }
+
+
+  modal.classList.remove(
+    "hidden"
+  );
+
 }
 
 
-// ============================================================
-// 10. MOSTRAR / OCULTAR NOTA
-// ============================================================
+/* ============================================================
+   23. RENDER NEWS
+   ============================================================ */
+
+function renderCurrentNews() {
+
+  if (!currentNews) {
+    return;
+  }
+
+
+  const headline =
+    document.getElementById(
+      "challenge-headline"
+    );
+
+
+  const article =
+    document.getElementById(
+      "article-body"
+    );
+
+
+  if (headline) {
+
+    headline.textContent =
+      currentNews.headline;
+
+  }
+
+
+  if (article) {
+
+    article.textContent =
+      currentNews.article;
+
+    article.classList.add(
+      "hidden"
+    );
+
+  }
+
+
+  const slider =
+    document.getElementById(
+      "clickbait-slider"
+    );
+
+
+  if (slider) {
+
+    slider.value = 50;
+
+  }
+
+}
+
+
+/* ============================================================
+   24. TOGGLE ARTICLE
+   ============================================================ */
 
 function toggleArticleBody() {
 
   const article =
-    document.getElementById("article-body");
+    document.getElementById(
+      "article-body"
+    );
 
-  if (article) {
-    article.classList.toggle("hidden");
-  }
+
+  if (!article) return;
+
+
+  article.classList.toggle(
+    "hidden"
+  );
+
 }
 
 
-// ============================================================
-// 11. COMPROBAR NOTICIA
-// ============================================================
+/* ============================================================
+   25. CHECK NEWS
+   ============================================================ */
 
 function checkClickbait() {
 
-  if (!currentNews) return;
+  if (!currentNews) {
+    return;
+  }
+
 
   const slider =
-    document.getElementById("clickbait-slider");
+    document.getElementById(
+      "clickbait-slider"
+    );
 
-  if (!slider) return;
+
+  if (!slider) {
+    return;
+  }
+
 
   const value =
     Number(slider.value);
 
-  // NOTICIA EXAGERADA
-  if (currentNews.exaggerated) {
 
-    if (value > 50) {
+  const dictionary =
+    translations[currentLanguage];
+
+
+  if (
+    currentNews.exaggerated
+  ) {
+
+    if (
+      value > 50
+    ) {
 
       alert(
-        "✅ ¡Excelente! Detectaste que el titular exageraba la información."
+        dictionary.goodFake
       );
 
       followers += 25;
@@ -725,21 +2302,21 @@ function checkClickbait() {
     } else {
 
       alert(
-        "⚠️ ¡Cuidado! El titular exageraba la información."
+        dictionary.badFake
       );
 
       viralLoad += 10;
+
     }
 
-  }
+  } else {
 
-  // NOTICIA VERDADERA
-  else {
-
-    if (value <= 50) {
+    if (
+      value <= 50
+    ) {
 
       alert(
-        "✅ ¡Excelente! Detectaste que el titular representa correctamente la información."
+        dictionary.goodTrue
       );
 
       followers += 25;
@@ -747,34 +2324,48 @@ function checkClickbait() {
     } else {
 
       alert(
-        "⚠️ ¡Cuidado! El titular sí representaba correctamente la información."
+        dictionary.badTrue
       );
 
       viralLoad += 10;
+
     }
+
   }
 
-  // Evitar que viralLoad supere 100
-  viralLoad = Math.min(viralLoad, 100);
+
+  viralLoad =
+    Math.min(
+      viralLoad,
+      100
+    );
+
 
   updateHUD();
 
   closeModal();
+
 }
 
 
-// ============================================================
-// 12. CAMINOS
-// ============================================================
+/* ============================================================
+   26. CHOOSE PATH
+   ============================================================ */
 
 function choosePath(path) {
 
-  if (path === "verifier") {
+  const dictionary =
+    translations[currentLanguage];
+
+
+  if (
+    path === "verifier"
+  ) {
 
     shields++;
 
     alert(
-      "🛡️ Tomaste el Camino Verificador: ganas +1 Escudo."
+      dictionary.verifierAlert
     );
 
   } else {
@@ -783,106 +2374,43 @@ function choosePath(path) {
 
     viralLoad += 10;
 
-    viralLoad = Math.min(viralLoad, 100);
+    viralLoad =
+      Math.min(
+        viralLoad,
+        100
+      );
+
 
     alert(
-      "⚡ Tomaste el Camino Rápido: ganas +30 Seguidores, pero sube la Carga Viral."
+      dictionary.fastAlert
     );
+
   }
+
 
   updateHUD();
+
 }
 
 
-// ============================================================
-// 13. LABORATORIO
-// ============================================================
-
-function runLabTool(tool) {
-
-  const output =
-    document.getElementById("lab-output");
-
-  if (!output) return;
-
-  if (tool === "ia") {
-
-    output.innerText =
-      "🤖 Análisis de IA: Se detectaron inconsistencias visuales. Probabilidad estimada de contenido generado o manipulado: 92%.";
-
-  }
-
-  if (tool === "source") {
-
-    output.innerText =
-      "🔗 Búsqueda de fuente: No se encontró un registro oficial que confirme esta publicación.";
-
-  }
-
-  if (tool === "meta") {
-
-    output.innerText =
-      "📄 Metadatos: El archivo presenta información que requiere una revisión adicional antes de considerarlo confiable.";
-  }
-}
-
-
-// ============================================================
-// 14. HUD
-// ============================================================
-
-function updateHUD() {
-
-  const followersElement =
-    document.getElementById("followers-count");
-
-  const shieldsElement =
-    document.getElementById("shields-count");
-
-  const viralMeter =
-    document.getElementById("viral-meter");
-
-  const viralText =
-    document.getElementById("viral-text");
-
-  if (followersElement) {
-    followersElement.innerText =
-      followers;
-  }
-
-  if (shieldsElement) {
-    shieldsElement.innerText =
-      shields;
-  }
-
-  if (viralMeter) {
-    viralMeter.style.width =
-      `${viralLoad}%`;
-  }
-
-  if (viralText) {
-
-    const t =
-      translations[currentLanguage];
-
-    viralText.innerText =
-      `${viralLoad}% - ${t.publicViral}`;
-  }
-}
-
-
-// ============================================================
-// 15. USAR ESCUDO
-// ============================================================
+/* ============================================================
+   27. SHIELD
+   ============================================================ */
 
 function useShield() {
 
-  if (shields > 0) {
+  const dictionary =
+    translations[currentLanguage];
+
+
+  if (
+    shields > 0
+  ) {
 
     shields--;
 
     alert(
-      "🛡️ Usaste un Escudo para neutralizar la amenaza."
+      dictionary.shieldUsed
     );
 
     updateHUD();
@@ -892,415 +2420,265 @@ function useShield() {
   } else {
 
     alert(
-      "❌ No tienes Escudos suficientes."
+      dictionary.noShield
     );
+
   }
+
 }
 
 
-// ============================================================
-// 16. CERRAR MODAL
-// ============================================================
+/* ============================================================
+   28. CLOSE MODAL
+   ============================================================ */
 
 function closeModal() {
 
   const modal =
-    document.getElementById("interactive-modal");
+    document.getElementById(
+      "interactive-modal"
+    );
+
 
   if (modal) {
-    modal.classList.add("hidden");
+
+    modal.classList.add(
+      "hidden"
+    );
+
   }
+
+  currentNews = null;
+
 }
 
 
-// ============================================================
-// 17. CAMBIAR IDIOMA
-// ============================================================
+/* ============================================================
+   29. UPDATE HUD
+   ============================================================ */
 
-function changeLanguage(lang) {
+function updateHUD() {
 
-  currentLanguage =
-    translations[lang]
-      ? lang
-      : "es";
-
-  const t =
-    translations[currentLanguage];
-
-  // ----------------------------------------------------------
-  // NAVBAR
-  // ----------------------------------------------------------
-
-  const navButtons =
-    document.querySelectorAll(".nav-links .nav-btn");
-
-  if (navButtons.length >= 4) {
-
-    navButtons[0].innerHTML =
-      `<i class="fa-solid fa-house"></i> ${t.nav[0]}`;
-
-    navButtons[1].innerHTML =
-      `<i class="fa-solid fa-gamepad"></i> ${t.nav[1]}`;
-
-    navButtons[2].innerHTML =
-      `<i class="fa-solid fa-flask"></i> ${t.nav[2]}`;
-
-    navButtons[3].innerHTML =
-      `<i class="fa-solid fa-trophy"></i> ${t.nav[3]}`;
-  }
-
-
-  // ----------------------------------------------------------
-  // HOME
-  // ----------------------------------------------------------
-
-  const pill =
-    document.querySelector(".pill-tag");
-
-  if (pill) {
-
-    pill.innerHTML =
-      `<i class="fa-solid fa-sparkles"></i> ${t.heroTag}`;
-  }
-
-  const heroTitle =
-    document.querySelector(".hero h1");
-
-  if (heroTitle) {
-    heroTitle.innerHTML =
-      t.heroTitle;
-  }
-
-  const heroText =
-    document.querySelector(".hero-subtext");
-
-  if (heroText) {
-    heroText.textContent =
-      t.heroText;
-  }
-
-
-  const heroButtons =
-    document.querySelectorAll(
-      ".hero-buttons button"
+  const followersElement =
+    document.getElementById(
+      "followers-count"
     );
 
-  if (heroButtons.length >= 2) {
 
-    heroButtons[0].innerHTML =
-      `<i class="fa-solid fa-play"></i> ${t.enterBoard}`;
-
-    heroButtons[1].innerHTML =
-      `<i class="fa-solid fa-microscope"></i> ${t.tools}`;
-  }
-
-
-  const statCards =
-    document.querySelectorAll(".stat-card p");
-
-  if (statCards.length >= 3) {
-
-    statCards[0].textContent =
-      t.stages;
-
-    statCards[1].textContent =
-      t.languages;
-
-    statCards[2].textContent =
-      t.viralGoal;
-  }
-
-
-  // ----------------------------------------------------------
-  // TABLERO
-  // ----------------------------------------------------------
-
-  const statusTitles =
-    document.querySelectorAll(".status-card h3");
-
-  if (statusTitles.length >= 3) {
-
-    statusTitles[0].innerHTML =
-      `<i class="fa-solid fa-biohazard"></i> ${t.publicViral}`;
-
-    statusTitles[1].innerHTML =
-      `<i class="fa-solid fa-user-check"></i> ${t.digitalProfile}`;
-
-    statusTitles[2].innerHTML =
-      `<i class="fa-solid fa-dharmachakra"></i> ${t.digitalWheel}`;
-  }
-
-
-  const statRows =
-    document.querySelectorAll(".stat-row span");
-
-  if (statRows.length >= 2) {
-
-    statRows[0].innerHTML =
-      `<i class="fa-solid fa-users"></i> ${t.followers}`;
-
-    statRows[1].innerHTML =
-      `<i class="fa-solid fa-shield-halved"></i> ${t.shields}`;
-  }
-
-
-  const wheelDisplay =
-    document.getElementById("wheel-display");
-
-  if (wheelDisplay) {
-
-    wheelDisplay.innerHTML =
-      `<span>${t.spinText}</span>`;
-  }
-
-
-  const spinButton =
-    document.getElementById("spin-btn");
-
-  if (spinButton) {
-    spinButton.textContent =
-      t.spin;
-  }
-
-
-  const boardTitle =
-    document.querySelector(".board-wrapper h2");
-
-  if (boardTitle) {
-    boardTitle.textContent =
-      t.boardTitle;
-  }
-
-
-  const stages =
-    document.querySelectorAll(".stage-label");
-
-  if (stages.length >= 4) {
-
-    stages[0].textContent =
-      t.stage1;
-
-    stages[1].textContent =
-      t.stage2;
-
-    stages[2].textContent =
-      t.stage3;
-
-    stages[3].textContent =
-      t.stage4;
-  }
-
-
-  const forkTitle =
-    document.querySelector(
-      ".bifurcation-box h4"
+  const shieldsElement =
+    document.getElementById(
+      "shields-count"
     );
 
-  if (forkTitle) {
 
-    forkTitle.innerHTML =
-      `<i class="fa-solid fa-code-fork"></i> ${t.forkTitle}`;
-  }
-
-
-  const pathButtons =
-    document.querySelectorAll(".btn-path");
-
-  if (pathButtons.length >= 2) {
-
-    pathButtons[0].innerHTML =
-      `<strong>${t.verifier}</strong><br><small>${t.verifierSmall}</small>`;
-
-    pathButtons[1].innerHTML =
-      `<strong>${t.fast}</strong><br><small>${t.fastSmall}</small>`;
-  }
-
-
-  // ----------------------------------------------------------
-  // LABORATORIO
-  // ----------------------------------------------------------
-
-  const labTitle =
-    document.querySelector("#page-lab h2");
-
-  if (labTitle) {
-
-    labTitle.innerHTML =
-      `<i class="fa-solid fa-flask"></i> ${t.labTitle}`;
-  }
-
-
-  const labDescription =
-    document.querySelector(
-      "#page-lab > .lab-container > p"
+  const viralMeter =
+    document.getElementById(
+      "viral-meter"
     );
 
-  if (labDescription) {
 
-    labDescription.textContent =
-      t.labDescription;
-  }
-
-
-  const labButtons =
-    document.querySelectorAll(
-      ".lab-buttons button"
+  const viralText =
+    document.getElementById(
+      "viral-text"
     );
 
-  if (labButtons.length >= 3) {
 
-    labButtons[0].innerHTML =
-      `<i class="fa-solid fa-robot"></i> ${t.scanAI}`;
+  if (
+    followersElement
+  ) {
 
-    labButtons[1].innerHTML =
-      `<i class="fa-solid fa-link"></i> ${t.source}`;
+    followersElement.textContent =
+      followers;
 
-    labButtons[2].innerHTML =
-      `<i class="fa-solid fa-file-code"></i> ${t.metadata}`;
   }
 
 
-  const labOutput =
-    document.getElementById("lab-output");
+  if (
+    shieldsElement
+  ) {
 
-  if (labOutput) {
+    shieldsElement.textContent =
+      shields;
 
-    labOutput.textContent =
-      t.labOutput;
   }
 
 
-  // ----------------------------------------------------------
-  // RANKING
-  // ----------------------------------------------------------
+  if (
+    viralMeter
+  ) {
 
-  const rankingTitle =
-    document.querySelector(
-      "#page-leaderboard h2"
-    );
+    viralMeter.style.width =
+      `${viralLoad}%`;
 
-  if (rankingTitle) {
-
-    rankingTitle.innerHTML =
-      `<i class="fa-solid fa-trophy"></i> ${t.rankingTitle}`;
   }
 
 
-  const headers =
-    document.querySelectorAll(
-      "#page-leaderboard th"
-    );
+  if (
+    viralText
+  ) {
 
-  if (headers.length >= 4) {
+    const viralTranslations = {
 
-    headers[0].textContent =
-      t.position;
+      es:
+        `${viralLoad}% - Virus bajo control`,
 
-    headers[1].textContent =
-      t.agent;
+      en:
+        `${viralLoad}% - Virus under control`,
 
-    headers[2].textContent =
-      t.trustedFollowers;
+      zh:
+        `${viralLoad}% - 病毒处于控制之下`
 
-    headers[3].textContent =
-      t.avoidedViral;
+    };
+
+
+    viralText.textContent =
+      viralTranslations[
+        currentLanguage
+      ];
+
   }
 
-
-  // ----------------------------------------------------------
-  // MODAL
-  // ----------------------------------------------------------
-
-  const challenge =
-    document.querySelector(
-      "#minigame-clickbait h3"
-    );
-
-  if (challenge) {
-
-    challenge.innerHTML =
-      `<i class="fa-solid fa-newspaper"></i> ${t.challenge}`;
-  }
-
-
-  const sliderLabel =
-    document.querySelector(
-      "#minigame-clickbait .slider-box label"
-    );
-
-  if (sliderLabel) {
-
-    sliderLabel.textContent =
-      t.slider;
-  }
-
-
-  const modalButtons =
-    document.querySelectorAll(
-      "#interactive-modal .modal-footer button"
-    );
-
-  if (modalButtons.length >= 2) {
-
-    modalButtons[0].textContent =
-      t.shield;
-
-    modalButtons[1].textContent =
-      t.close;
-  }
-
-
-  const readArticleButton =
-    document.querySelector(
-      "#minigame-clickbait .btn-secondary"
-    );
-
-  if (readArticleButton) {
-
-    readArticleButton.textContent =
-      t.readArticle;
-  }
-
-
-  const confirmButton =
-    document.querySelector(
-      "#minigame-clickbait .btn-primary"
-    );
-
-  if (confirmButton) {
-
-    confirmButton.textContent =
-      t.confirm;
-  }
-
-
-  // Cambiar idioma real del documento
-  document.documentElement.lang =
-    currentLanguage;
-
-
-  // Actualizar HUD
-  updateHUD();
-
-
-  // Redibujar tablero
-  renderBoard();
 }
 
 
-// ============================================================
-// 18. INICIAR EL JUEGO
-// ============================================================
+/* ============================================================
+   30. LABORATORY
+   ============================================================ */
 
-document.addEventListener("DOMContentLoaded", () => {
+function runLabTool(tool) {
 
-  // Dibujar tablero inmediatamente
-  renderBoard();
+  const output =
+    document.getElementById(
+      "lab-output"
+    );
 
-  // Actualizar estadísticas
+
+  if (!output) {
+    return;
+  }
+
+
+  const responses = {
+
+    es: {
+
+      ia:
+        "🤖 Análisis de IA:\n\nSe detectaron inconsistencias visuales. Probabilidad simulada de contenido generado por IA: 92%.\n\nRecuerda: una herramienta de IA no debe considerarse una prueba definitiva.",
+
+      source:
+        "🔗 Fuente original:\n\nNo se encontró un registro oficial de esta afirmación. Busca quién publicó originalmente la información y compárala con otras fuentes.",
+
+      meta:
+        "📄 Metadatos:\n\nEl contenido presenta información que requiere investigación adicional. Revisa fecha, origen, autor y contexto."
+
+    },
+
+
+    en: {
+
+      ia:
+        "🤖 AI Analysis:\n\nVisual inconsistencies were detected. Simulated probability of AI-generated content: 92%.\n\nRemember: an AI detector should not be treated as definitive proof.",
+
+      source:
+        "🔗 Original Source:\n\nNo official record of this claim was found. Check who originally published the information and compare it with other sources.",
+
+      meta:
+        "📄 Metadata:\n\nThe content contains information that requires further investigation. Check the date, origin, author, and context."
+
+    },
+
+
+    zh: {
+
+      ia:
+        "🤖 AI 分析：\n\n检测到视觉不一致。模拟的 AI 生成内容概率为 92%。\n\n请记住：AI 检测工具不应该被视为最终证据。",
+
+      source:
+        "🔗 原始来源：\n\n没有找到该说法的官方记录。请查找最初发布信息的人，并与其他可靠来源进行比较。",
+
+      meta:
+        "📄 元数据：\n\n该内容包含需要进一步调查的信息。请检查日期、来源、作者和背景。"
+
+    }
+
+  };
+
+
+  output.textContent =
+    responses[
+      currentLanguage
+    ][tool];
+
+}
+
+
+/* ============================================================
+   31. LAB NEWS
+   ============================================================ */
+
+function updateLabNews() {
+
+  const headline =
+    document.getElementById(
+      "lab-news-headline"
+    );
+
+
+  if (!headline) {
+    return;
+  }
+
+
+  const news =
+    newsDatabase.find(
+      item =>
+        item.lang ===
+        currentLanguage
+    );
+
+
+  if (news) {
+
+    headline.textContent =
+      news.headline;
+
+  }
+
+}
+
+
+/* ============================================================
+   32. INITIALIZE
+   ============================================================ */
+
+function initializeGame() {
+
+  createBoard();
+
+  chooseCharacter(
+    currentCharacter
+  );
+
   updateHUD();
 
-  // Asegurar idioma inicial
-  changeLanguage("es");
+  updateCurrentStage();
 
-});
+  changeLanguage(
+    currentLanguage
+  );
+
+}
+
+
+/* ============================================================
+   33. DOM READY
+   ============================================================ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    initializeGame();
+
+  }
+);
