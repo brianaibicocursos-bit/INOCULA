@@ -415,4 +415,3 @@ function changeLanguage(lang) {
     navButtons[3].innerHTML =
       '<i class="fa-solid fa-trophy"></i> ' + t.ranking;
   }
-}
