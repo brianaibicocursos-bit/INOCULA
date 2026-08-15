@@ -377,21 +377,3 @@ function changeLanguage(lang) {
   // Cambia también el idioma del documento
   document.documentElement.lang = lang;
 }
-
-  const t = translations[lang];
-
-  const navButtons = document.querySelectorAll(".nav-links .nav-btn");
-
-  if (navButtons.length >= 4) {
-    navButtons[0].innerHTML =
-      '<i class="fa-solid fa-house"></i> ' + t.inicio;
-
-    navButtons[1].innerHTML =
-      '<i class="fa-solid fa-gamepad"></i> ' + t.tablero;
-
-    navButtons[2].innerHTML =
-      '<i class="fa-solid fa-flask"></i> ' + t.laboratorio;
-
-    navButtons[3].innerHTML =
-      '<i class="fa-solid fa-trophy"></i> ' + t.ranking;
-  }
