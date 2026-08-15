@@ -11,41 +11,69 @@ let viralLoad = 15;
 let followers = 100;
 let shields = 1;
 
+const fakeNews = [
+  {
+    headline: "🚨 ¡Tomar agua con limón elimina todas las toxinas del cuerpo!",
+    article: "El agua con limón puede formar parte de una alimentación saludable, pero el cuerpo ya cuenta con órganos como el hígado y los riñones para eliminar sustancias de desecho.",
+    exaggerated: true
+  },
+  {
+    headline: "🧠 ¡El cerebro utiliza electricidad para comunicarse!",
+    article: "Las neuronas utilizan señales eléctricas y químicas para transmitir información.",
+    exaggerated: false
+  },
+  {
+    headline: "🚨 ¡Instagram puede leer tus pensamientos!",
+    article: "Las plataformas pueden recopilar información sobre actividad, intereses e interacciones, pero eso no significa que puedan leer directamente los pensamientos.",
+    exaggerated: true
+  },
+  {
+    headline: "🦠 ¡Lavarse las manos puede ayudar a prevenir enfermedades!",
+    article: "La higiene de manos ayuda a reducir la transmisión de microorganismos.",
+    exaggerated: false
+  },
+  {
+    headline: "🚨 ¡La inteligencia artificial nunca se equivoca!",
+    article: "Los sistemas de inteligencia artificial pueden producir respuestas incorrectas o información inventada y necesitan verificación.",
+    exaggerated: true
+  },
+  {
+    headline: "🌳 ¡Los árboles ayudan a absorber dióxido de carbono!",
+    article: "Las plantas absorben dióxido de carbono durante la fotosíntesis.",
+    exaggerated: false
+  },
+  {
+    headline: "🚨 ¡Plantar un solo árbol resolverá el cambio climático!",
+    article: "Los árboles ayudan al ambiente, pero resolver el cambio climático requiere múltiples acciones.",
+    exaggerated: true
+  },
+  {
+    headline: "📱 ¡Tu ubicación puede ser compartida por algunas aplicaciones!",
+    article: "Algunas aplicaciones pueden solicitar permisos de ubicación para ofrecer determinadas funciones.",
+    exaggerated: false
+  },
+  {
+    headline: "🚨 ¡Si una noticia tiene millones de likes, definitivamente es verdadera!",
+    article: "La popularidad de una publicación no demuestra que la información sea cierta.",
+    exaggerated: true
+  },
+  {
+    headline: "🔎 ¡Comparar varias fuentes puede ayudar a detectar información falsa!",
+    article: "Contrastar diferentes fuentes confiables puede ayudar a identificar inconsistencias.",
+    exaggerated: false
+  }
+];
+
 function spinWheel() {
   const moves = Math.floor(Math.random() * 4) + 1;
-  document.getElementById('wheel-display').innerHTML = `<strong>Avanzas ${moves} casillas</strong>`;
-  
+
+  document.getElementById('wheel-display').innerHTML =
+    `<strong>Avanzas ${moves} casillas</strong>`;
+
   setTimeout(() => {
     openMinigame('clickbait');
   }, 800);
 }
-const fakeNews = [
-  {
-    headline: "🚨 NOTICIA: ¡Este alimento destruye tu salud en segundos!",
-    source: "Publicado por @ViralNews_99 hace 5 minutos",
-    article: "Un estudio en 10 personas sugiere que el consumo excesivo de sal durante 30 años podría elevar ligeramente la presión arterial."
-  },
-  {
-    headline: "🚨 ÚLTIMA HORA: ¡Tomar agua fría causa enfermedades graves!",
-    source: "Publicado por @HealthFlash hace 12 minutos",
-    article: "No existe evidencia científica sólida de que beber agua fría por sí solo cause enfermedades graves."
-  },
-  {
-    headline: "🚨 VIRAL: ¡Las redes sociales pueden leer tus pensamientos!",
-    source: "Publicado por @TechSecrets hace 20 minutos",
-    article: "Las redes sociales pueden recopilar información sobre tus hábitos y preferencias, pero no existe evidencia de que puedan leer directamente tus pensamientos."
-  },
-  {
-    headline: "🚨 ALERTA: ¡Dormir con el celular cerca provoca pérdida inmediata de memoria!",
-    source: "Publicado por @InfoViral hace 8 minutos",
-    article: "El uso excesivo del celular puede afectar el sueño y la atención, pero no existe evidencia de una pérdida inmediata de memoria por dormir cerca del dispositivo."
-  },
-  {
-    headline: "🚨 DESCUBRIMIENTO: ¡Las imágenes satelitales son completamente falsas!",
-    source: "Publicado por @ViralNews_99 hace 3 minutos",
-    article: "Las imágenes satelitales son utilizadas ampliamente en investigación, meteorología, agricultura y navegación. Algunas imágenes pueden ser manipuladas o editadas, pero eso no significa que todas sean falsas."
-  }
-];
 function openMinigame(type) {
   const modal = document.getElementById('interactive-modal');
 
