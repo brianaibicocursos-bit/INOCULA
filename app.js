@@ -354,7 +354,7 @@ function changeLanguage(lang) {
     headers[3].textContent = t.avoidedViral;
   }
 
-  // Modal
+// Modal
   document.querySelector("#minigame-clickbait h3").innerHTML =
     `<i class="fa-solid fa-newspaper"></i> ${t.challenge}`;
 
@@ -377,26 +377,6 @@ function changeLanguage(lang) {
   // Cambia también el idioma del documento
   document.documentElement.lang = lang;
 }
-  const translations = {
-    es: {
-      inicio: "Inicio",
-      tablero: "Tablero",
-      laboratorio: "Laboratorio",
-      ranking: "Ranking"
-    },
-    en: {
-      inicio: "Home",
-      tablero: "Game Board",
-      laboratorio: "Laboratory",
-      ranking: "Leaderboard"
-    },
-    zh: {
-      inicio: "首页",
-      tablero: "游戏板",
-      laboratorio: "实验室",
-      ranking: "排行榜"
-    }
-  };
 
   const t = translations[lang];
 
