@@ -56,22 +56,7 @@ function openMinigame(type) {
   });
 
   if (type === 'clickbait') {
-    const game = document.getElementById('minigame-clickbait');
-
-    const randomIndex = Math.floor(Math.random() * fakeNews.length);
-    const news = fakeNews[randomIndex];
-
-    game.querySelector('.headline').textContent = `"${news.headline}"`;
-    game.querySelector('.headline').dataset.article = news.article;
-
-    const articleBody = document.getElementById('article-body');
-    articleBody.textContent = news.article;
-    articleBody.classList.add('hidden');
-
-    const sourceText = game.querySelector('.fake-post p');
-    sourceText.textContent = news.source;
-
-    game.classList.remove('hidden');
+    document.getElementById('minigame-clickbait').classList.remove('hidden');
   }
 }
 function toggleArticleBody() {
