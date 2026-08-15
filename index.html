@@ -1,229 +1,673 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>INOCULA · Tablero de Vida Digital</title>
-  
-  <!-- Tipografía e Iconos -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  
-  <!-- Estilos Locales -->
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
+// ==========================================
+// INOCULA · SISTEMA PRINCIPAL
+// ==========================================
 
-  <!-- NAVBAR DE NAVEGACIÓN ENTRE PÁGINAS -->
-  <nav class="navbar">
-    <div class="logo" onclick="navigateTo('page-home')">
-      <i class="fa-solid fa-shield-virus"></i>
-      <span>INOCULA</span>
-    </div>
 
-    <div class="nav-links">
-      <button class="nav-btn active" onclick="navigateTo('page-home')"><i class="fa-solid fa-house"></i> Inicio</button>
-      <button class="nav-btn" onclick="navigateTo('page-game')"><i class="fa-solid fa-gamepad"></i> Tablero</button>
-      <button class="nav-btn" onclick="navigateTo('page-lab')"><i class="fa-solid fa-flask"></i> Laboratorio</button>
-      <button class="nav-btn" onclick="navigateTo('page-leaderboard')"><i class="fa-solid fa-trophy"></i> Ranking</button>
-    </div>
+// ==========================================
+// NAVEGACIÓN
+// ==========================================
 
-    <div class="nav-controls">
-      <div class="lang-selector">
-        <i class="fa-solid fa-globe"></i>
-        <select id="lang-select" onchange="changeLanguage(this.value)">
-          <option value="es">Español</option>
-          <option value="en">English</option>
-          <option value="zh">中文</option>
-        </select>
-      </div>
+function navigateTo(pageId) {
 
-      <div class="hackathon-badge">UNESCO Youth 2026</div>
-    </div>
-  </nav>
+  document.querySelectorAll('.page-view').forEach(page => {
+    page.classList.add('hidden');
+  });
 
-  <!-- PÁGINA 1: LANDING / INICIO -->
-  <section id="page-home" class="page-view active">
-    <div class="hero">
-      <span class="pill-tag"><i class="fa-solid fa-sparkles"></i> UNESCO Youth Hackathon 2026</span>
-      <h1>Antes de creer, <span class="gradient-text">inocúlate.</span></h1>
-      <p class="hero-subtext">
-        El tablero de vida digital que te entrena para detectar fake news, 
-        deepfakes y manipulación en tu día a día digital.
-      </p>
-      
-      <div class="hero-buttons">
-        <button class="btn-primary" onclick="navigateTo('page-game')">
-          <i class="fa-solid fa-play"></i> Entrar al Tablero
-        </button>
-        <button class="btn-secondary" onclick="navigateTo('page-lab')">
-          <i class="fa-solid fa-microscope"></i> Probar Herramientas
-        </button>
-      </div>
+  document.getElementById(pageId).classList.remove('hidden');
 
-      <div class="hero-stats">
-        <div class="stat-card">
-          <h2>4</h2>
-          <p>Etapas del Día</p>
-        </div>
-        <div class="stat-card">
-          <h2>3</h2>
-          <p>Idiomas (ES, EN, ZH)</p>
-        </div>
-        <div class="stat-card">
-          <h2>0%</h2>
-          <p>Carga Viral Meta</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  document.querySelectorAll('.nav-btn').forEach(button => {
+    button.classList.remove('active');
+  });
 
-  <!-- PÁGINA 2: TABLERO DE JUEGO (GAME OF LIFE) -->
-  <section id="page-game" class="page-view hidden">
-    <main class="main-layout">
-      <!-- PANEL DE ESTADO DIGITAL -->
-      <aside class="status-panel">
-        <div class="status-card viral-card">
-          <h3><i class="fa-solid fa-biohazard"></i> Carga Viral Pública</h3>
-          <div class="progress-bar">
-            <div id="viral-meter" class="progress-fill" style="width: 15%;"></div>
-          </div>
-          <p id="viral-text">15% - Virus bajo control</p>
-        </div>
+}
 
-        <div class="status-card player-card">
-          <h3><i class="fa-solid fa-user-check"></i> Perfil Digital</h3>
-          <div class="stat-row">
-            <span><i class="fa-solid fa-users" style="color: #3b82f6;"></i> Seguidores:</span>
-            <strong id="followers-count">100</strong>
-          </div>
-          <div class="stat-row">
-            <span><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Escudos:</span>
-            <strong id="shields-count">1</strong>
-          </div>
-        </div>
 
-        <div class="status-card spinner-card">
-          <h3><i class="fa-solid fa-dharmachakra"></i> Rueda Digital</h3>
-          <div id="wheel-display" class="wheel-box">
-            <span>Gira la Rueda</span>
-          </div>
-          <button id="spin-btn" class="btn-spin" onclick="spinWheel()">GIRAR RUEDA</button>
-        </div>
-      </aside>
+// ==========================================
+// ESTADO DEL JUEGO
+// ==========================================
 
-      <!-- TABLERO -->
-      <section class="board-wrapper">
-        <h2>Tablero: Tu Navegación Diaria</h2>
-        
-        <div class="path-container">
-          <div class="day-stage stage-morning">
-            <span class="stage-label">Etapa 1: Despertar & Feed Matutino</span>
-            <div class="stage-tiles" id="stage-1"></div>
-          </div>
+let viralLoad = 15;
+let followers = 100;
+let shields = 1;
 
-          <div class="bifurcation-box">
-            <h4><i class="fa-solid fa-code-fork"></i> ¡Punto de Bifurcación! Elige tu camino:</h4>
-            <div class="bifurcation-options">
-              <button class="btn-path path-verifier" onclick="choosePath('verifier')">
-                <strong>Camino Verificador</strong><br><small>Más lento, gana Escudos de protección</small>
-              </button>
-              <button class="btn-path path-fast" onclick="choosePath('fast')">
-                <strong>Camino Rápido</strong><br><small>Avanzas rápido, asumes riesgo de Fake News</small>
-              </button>
-            </div>
-          </div>
 
-          <div class="day-stage stage-work">
-            <span class="stage-label">Etapa 2: Trabajo / Escuela & Chats</span>
-            <div class="stage-tiles" id="stage-2"></div>
-          </div>
+// ==========================================
+// RUEDA DIGITAL
+// ==========================================
 
-          <div class="day-stage stage-afternoon">
-            <span class="stage-label">Etapa 3: Tarde, Noticias & Redes</span>
-            <div class="stage-tiles" id="stage-3"></div>
-          </div>
+function spinWheel() {
 
-          <div class="day-stage stage-night">
-            <span class="stage-label">Etapa 4: Noche, Viral & Retiro Digital</span>
-            <div class="stage-tiles" id="stage-4"></div>
-          </div>
-        </div>
-      </section>
-    </main>
-  </section>
+  const moves = Math.floor(Math.random() * 4) + 1;
 
-  <!-- PÁGINA 3: LABORATORIO -->
-  <section id="page-lab" class="page-view hidden">
-    <div class="lab-container">
-      <h2><i class="fa-solid fa-flask"></i> Laboratorio de Verificación</h2>
-      <p>Simulador interactivo para analizar noticias antes de compartirlas:</p>
-      
-      <div class="lab-card">
-        <div class="fake-post">
-          <h4>🚨 NOTICIA TENDENCIA: "Descubren que las imágenes satelitales son falsas"</h4>
-          <p>Publicado por @ViralNews_99 hace 5 minutos</p>
-        </div>
-        <div class="lab-buttons">
-          <button class="btn-secondary" onclick="runLabTool('ia')"><i class="fa-solid fa-robot"></i> Escanear IA</button>
-          <button class="btn-secondary" onclick="runLabTool('source')"><i class="fa-solid fa-link"></i> Buscar Fuente Original</button>
-          <button class="btn-secondary" onclick="runLabTool('meta')"><i class="fa-solid fa-file-code"></i> Revisar Metadatos</button>
-        </div>
-        <div id="lab-output" class="lab-output-box">Selecciona una herramienta para inspeccionar el contenido.</div>
-      </div>
-    </div>
-  </section>
+  document.getElementById('wheel-display').innerHTML =
+    `<strong>Avanzas ${moves} casillas</strong>`;
 
-  <!-- PÁGINA 4: RANKING -->
-  <section id="page-leaderboard" class="page-view hidden">
-    <div class="leaderboard-container">
-      <h2><i class="fa-solid fa-trophy"></i> Agentes INOCULA Destacados</h2>
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Posición</th>
-              <th>Agente</th>
-              <th>Seguidores Confiables</th>
-              <th>Carga Viral Evitada</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>🥇 #1</td><td>Agente_Bree</td><td>950</td><td>-80%</td></tr>
-            <tr><td>🥈 #2</td><td>FactChecker_Kendra</td><td>820</td><td>-65%</td></tr>
-            <tr><td>🥉 #3</td><td>Cyber_Carolina</td><td>740</td><td>-50%</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
+  setTimeout(() => {
+    openMinigame('clickbait');
+  }, 800);
 
-  <!-- MODAL DE RETOS (Súper Visual) -->
-  <div id="interactive-modal" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div id="minigame-clickbait" class="minigame-view hidden">
-        <h3><i class="fa-solid fa-newspaper"></i> Reto: Titular vs Nota</h3>
-        <p class="headline">"¡Este alimento destruye tu salud en segundos!"</p>
-        <button class="btn-secondary" onclick="toggleArticleBody()">📄 Leer nota completa</button>
-        <div id="article-body" class="article-text hidden">
-          "Un estudio en 10 personas sugiere que el consumo excesivo de sal durante 30 años podría elevar ligeramente la presión arterial."
-        </div>
-        <div class="slider-box">
-          <label>¿El titular representa la nota o exagera?</label>
-          <input type="range" id="clickbait-slider" min="0" max="100" value="50">
-        </div>
-        <button class="btn-primary" onclick="checkClickbait()">Confirmar Evaluación</button>
-      </div>
+}
 
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="useShield()">🛡️ Usar Escudo para Saltar</button>
-        <button class="btn-danger" onclick="closeModal()">Cerrar</button>
-      </div>
-    </div>
-  </div>
 
-  <script src="app.js"></script>
-</body>
-</html>
+// ==========================================
+// MINI JUEGOS
+// ==========================================
+
+function openMinigame(type) {
+
+  const modal = document.getElementById('interactive-modal');
+
+  modal.classList.remove('hidden');
+
+  document.querySelectorAll('.minigame-view').forEach(game => {
+    game.classList.add('hidden');
+  });
+
+  if (type === 'clickbait') {
+    document.getElementById('minigame-clickbait').classList.remove('hidden');
+  }
+
+}
+
+
+function toggleArticleBody() {
+
+  document.getElementById('article-body')
+    .classList.toggle('hidden');
+
+}
+
+
+function checkClickbait() {
+
+  const val = document.getElementById('clickbait-slider').value;
+
+  if (val > 50) {
+
+    alert(
+      currentLanguage === 'es'
+        ? "¡Excelente! Detectaste que el titular exageraba la nota."
+        : currentLanguage === 'en'
+        ? "Excellent! You detected that the headline exaggerated the article."
+        : "太棒了！你发现标题夸大了文章内容。"
+    );
+
+    followers += 25;
+
+  } else {
+
+    alert(
+      currentLanguage === 'es'
+        ? "Caíste en el titular engañoso. Subió la Carga Viral."
+        : currentLanguage === 'en'
+        ? "You fell for the misleading headline. Viral Load increased."
+        : "你被误导性标题影响了。病毒负荷上升了。"
+    );
+
+    viralLoad += 10;
+
+  }
+
+  updateHUD();
+  closeModal();
+
+}
+
+
+// ==========================================
+// ELECCIÓN DE CAMINO
+// ==========================================
+
+function choosePath(path) {
+
+  if (path === 'verifier') {
+
+    shields++;
+
+    alert(
+      currentLanguage === 'es'
+        ? "Tomaste el Camino Verificador: +1 Escudo."
+        : currentLanguage === 'en'
+        ? "You chose the Verification Path: +1 Shield."
+        : "你选择了验证路径：获得 +1 防护盾。"
+    );
+
+  } else {
+
+    followers += 30;
+    viralLoad += 10;
+
+    alert(
+      currentLanguage === 'es'
+        ? "Tomaste el Camino Rápido: +30 Seguidores, pero aumentó la Carga Viral."
+        : currentLanguage === 'en'
+        ? "You chose the Fast Path: +30 Followers, but Viral Load increased."
+        : "你选择了快速路径：+30 粉丝，但病毒负荷上升。"
+    );
+
+  }
+
+  updateHUD();
+
+}
+
+
+// ==========================================
+// LABORATORIO
+// ==========================================
+
+function runLabTool(tool) {
+
+  const output = document.getElementById('lab-output');
+
+  if (tool === 'ia') {
+
+    output.innerText =
+      currentLanguage === 'es'
+        ? "🤖 Análisis de IA: Inconsistencias visuales detectadas (92% de probabilidad de IA)."
+        : currentLanguage === 'en'
+        ? "🤖 AI Analysis: Visual inconsistencies detected (92% probability of AI generation)."
+        : "🤖 AI 分析：检测到视觉不一致（92% 可能由 AI 生成）。";
+
+  }
+
+  if (tool === 'source') {
+
+    output.innerText =
+      currentLanguage === 'es'
+        ? "🔗 Búsqueda de Fuente: No existe ningún registro oficial de esta noticia."
+        : currentLanguage === 'en'
+        ? "🔗 Source Search: No official record of this news story was found."
+        : "🔗 来源搜索：没有找到这条新闻的官方记录。";
+
+  }
+
+  if (tool === 'meta') {
+
+    output.innerText =
+      currentLanguage === 'es'
+        ? "📄 Metadatos: Archivo modificado por última vez en 2019."
+        : currentLanguage === 'en'
+        ? "📄 Metadata: File was last modified in 2019."
+        : "📄 元数据：文件最后一次修改于 2019 年。";
+
+  }
+
+}
+
+
+// ==========================================
+// ACTUALIZAR HUD
+// ==========================================
+
+function updateHUD() {
+
+  document.getElementById('followers-count').innerText = followers;
+
+  document.getElementById('shields-count').innerText = shields;
+
+  document.getElementById('viral-meter').style.width =
+    `${Math.min(viralLoad, 100)}%`;
+
+  document.getElementById('viral-text').innerText =
+    currentLanguage === 'es'
+      ? `${viralLoad}% - Carga Viral Global`
+      : currentLanguage === 'en'
+      ? `${viralLoad}% - Global Viral Load`
+      : `${viralLoad}% - 全球病毒负荷`;
+
+}
+
+
+// ==========================================
+// ESCUDO
+// ==========================================
+
+function useShield() {
+
+  if (shields > 0) {
+
+    shields--;
+
+    alert(
+      currentLanguage === 'es'
+        ? "Usaste un Escudo para neutralizar la amenaza."
+        : currentLanguage === 'en'
+        ? "You used a Shield to neutralize the threat."
+        : "你使用了防护盾来中和威胁。"
+    );
+
+    updateHUD();
+    closeModal();
+
+  } else {
+
+    alert(
+      currentLanguage === 'es'
+        ? "No tienes Escudos suficientes."
+        : currentLanguage === 'en'
+        ? "You don't have enough Shields."
+        : "你的防护盾不足。"
+    );
+
+  }
+
+}
+
+
+// ==========================================
+// CERRAR MODAL
+// ==========================================
+
+function closeModal() {
+
+  document
+    .getElementById('interactive-modal')
+    .classList.add('hidden');
+
+}
+
+
+// ==========================================
+// IDIOMAS
+// ==========================================
+
+let currentLanguage = 'es';
+
+
+const translations = {
+
+  es: {
+
+    navHome: "Inicio",
+    navGame: "Tablero",
+    navLab: "Laboratorio",
+    navRanking: "Ranking",
+
+    badge: "UNESCO Youth 2026",
+
+    heroTitle: "Antes de creer,",
+    heroHighlight: "inocúlate.",
+
+    heroStrong: "Entrena tu mente antes de entrar al feed.",
+    heroDescription: "La desinformación no siempre parece falsa. Aprende a detectarla antes de compartirla.",
+
+    start: "Empezar mi entrenamiento",
+    tools: "Probar Herramientas",
+
+    time: "90 segundos",
+    decisions: "5 decisiones",
+    immunity: "1 nivel de inmunidad",
+
+    stages: "Etapas del Día",
+    languages: "Idiomas (ES, EN, ZH)",
+    viralGoal: "Carga Viral Meta",
+
+    viralTitle: "Carga Viral Pública",
+    viralLow: "Virus bajo control",
+
+    profile: "Perfil Digital",
+    followers: "Seguidores:",
+    shields: "Escudos:",
+
+    wheel: "Rueda Digital",
+    spin: "GIRAR RUEDA",
+
+    boardTitle: "Tablero: Tu Navegación Diaria",
+
+    morning: "Etapa 1: Despertar & Feed Matutino",
+    work: "Etapa 2: Trabajo / Escuela & Chats",
+    afternoon: "Etapa 3: Tarde, Noticias & Redes",
+    night: "Etapa 4: Noche, Viral & Retiro Digital",
+
+    branchTitle: "¡Punto de Bifurcación! Elige tu camino:",
+    verifier: "Camino Verificador",
+    verifierDescription: "Más lento, gana Escudos de protección",
+    fast: "Camino Rápido",
+    fastDescription: "Avanzas rápido, asumes riesgo de Fake News",
+
+    labTitle: "Laboratorio de Verificación",
+    labDescription: "Simulador interactivo para analizar noticias antes de compartirlas:",
+
+    ai: "Escanear IA",
+    source: "Buscar Fuente Original",
+    metadata: "Revisar Metadatos",
+
+    labPlaceholder: "Selecciona una herramienta para inspeccionar el contenido.",
+
+    rankingTitle: "Agentes INOCULA Destacados",
+
+    position: "Posición",
+    agent: "Agente",
+    reliable: "Seguidores Confiables",
+    avoided: "Carga Viral Evitada"
+
+  },
+
+
+  en: {
+
+    navHome: "Home",
+    navGame: "Dashboard",
+    navLab: "Verification Lab",
+    navRanking: "Leaderboard",
+
+    badge: "UNESCO Youth 2026",
+
+    heroTitle: "Before you believe,",
+    heroHighlight: "inoculate yourself.",
+
+    heroStrong: "Train your mind before entering the feed.",
+    heroDescription: "Misinformation doesn't always look fake. Learn to detect it before sharing it.",
+
+    start: "Start My Training",
+    tools: "Try the Tools",
+
+    time: "90 seconds",
+    decisions: "5 decisions",
+    immunity: "1 immunity level",
+
+    stages: "Daily Stages",
+    languages: "Languages (ES, EN, ZH)",
+    viralGoal: "Target Viral Load",
+
+    viralTitle: "Public Viral Load",
+    viralLow: "Virus under control",
+
+    profile: "Digital Profile",
+    followers: "Followers:",
+    shields: "Shields:",
+
+    wheel: "Digital Wheel",
+    spin: "SPIN WHEEL",
+
+    boardTitle: "Dashboard: Your Daily Navigation",
+
+    morning: "Stage 1: Wake Up & Morning Feed",
+    work: "Stage 2: School / Work & Chats",
+    afternoon: "Stage 3: Afternoon, News & Social Media",
+    night: "Stage 4: Night, Viral Content & Digital Detox",
+
+    branchTitle: "Decision Point! Choose your path:",
+    verifier: "Verification Path",
+    verifierDescription: "Slower, but you earn Protection Shields",
+    fast: "Fast Path",
+    fastDescription: "Move faster, but risk misinformation",
+
+    labTitle: "Verification Laboratory",
+    labDescription: "Interactive simulator to analyze news before sharing it:",
+
+    ai: "Scan for AI",
+    source: "Find Original Source",
+    metadata: "Review Metadata",
+
+    labPlaceholder: "Select a tool to inspect the content.",
+
+    rankingTitle: "Top INOCULA Agents",
+
+    position: "Position",
+    agent: "Agent",
+    reliable: "Trusted Followers",
+    avoided: "Viral Load Avoided"
+
+  },
+
+
+  zh: {
+
+    navHome: "首页",
+    navGame: "数字棋盘",
+    navLab: "验证实验室",
+    navRanking: "排行榜",
+
+    badge: "UNESCO 青年 2026",
+
+    heroTitle: "在相信之前，",
+    heroHighlight: "先建立免疫力。",
+
+    heroStrong: "在进入信息流之前训练你的思维。",
+    heroDescription: "虚假信息并不总是看起来是假的。学习在分享之前识别它。",
+
+    start: "开始我的训练",
+    tools: "尝试工具",
+
+    time: "90 秒",
+    decisions: "5 个决定",
+    immunity: "1 个免疫等级",
+
+    stages: "每日阶段",
+    languages: "语言（西班牙语、英语、中文）",
+    viralGoal: "目标病毒负荷",
+
+    viralTitle: "公共病毒负荷",
+    viralLow: "病毒处于控制状态",
+
+    profile: "数字档案",
+    followers: "粉丝：",
+    shields: "防护盾：",
+
+    wheel: "数字转盘",
+    spin: "旋转转盘",
+
+    boardTitle: "数字棋盘：你的每日信息导航",
+
+    morning: "阶段 1：起床与早晨信息流",
+    work: "阶段 2：学校 / 工作与聊天",
+    afternoon: "阶段 3：下午、新闻与社交媒体",
+    night: "阶段 4：夜间、病毒内容与数字休息",
+
+    branchTitle: "分岔点！选择你的道路：",
+    verifier: "验证者道路",
+    verifierDescription: "速度较慢，但可以获得防护盾",
+    fast: "快速道路",
+    fastDescription: "前进更快，但承担假新闻风险",
+
+    labTitle: "信息验证实验室",
+    labDescription: "在分享新闻之前进行分析的互动模拟器：",
+
+    ai: "AI 扫描",
+    source: "寻找原始来源",
+    metadata: "检查元数据",
+
+    labPlaceholder: "选择一个工具来检查内容。",
+
+    rankingTitle: "INOCULA 优秀特工",
+
+    position: "排名",
+    agent: "特工",
+    reliable: "可信粉丝",
+    avoided: "避免的病毒负荷"
+
+  }
+
+};
+
+
+// ==========================================
+// CAMBIAR IDIOMA
+// ==========================================
+
+function changeLanguage(lang) {
+
+  currentLanguage = lang;
+
+  const t = translations[lang];
+
+  // NAVBAR
+
+  document.querySelectorAll('.nav-btn')[0].innerHTML =
+    `<i class="fa-solid fa-house"></i> ${t.navHome}`;
+
+  document.querySelectorAll('.nav-btn')[1].innerHTML =
+    `<i class="fa-solid fa-gamepad"></i> ${t.navGame}`;
+
+  document.querySelectorAll('.nav-btn')[2].innerHTML =
+    `<i class="fa-solid fa-flask"></i> ${t.navLab}`;
+
+  document.querySelectorAll('.nav-btn')[3].innerHTML =
+    `<i class="fa-solid fa-trophy"></i> ${t.navRanking}`;
+
+
+  // HERO
+
+  document.querySelector('.pill-tag').innerHTML =
+    `<i class="fa-solid fa-sparkles"></i> ${t.badge}`;
+
+  document.querySelector('.hero h1').innerHTML =
+    `${t.heroTitle} <span class="gradient-text">${t.heroHighlight}</span>`;
+
+  document.querySelector('.hero-subtext strong').innerText =
+    t.heroStrong;
+
+  document.querySelectorAll('.hero-subtext')[0].innerHTML =
+    `<strong>${t.heroStrong}</strong><br>${t.heroDescription}`;
+
+
+  document.querySelector('.btn-primary').innerHTML =
+    `<i class="fa-solid fa-shield-virus"></i> ${t.start}`;
+
+  document.querySelector('.btn-secondary').innerHTML =
+    `<i class="fa-solid fa-microscope"></i> ${t.tools}`;
+
+
+  // INFORMACIÓN DEL ENTRENAMIENTO
+
+  const trainingInfo =
+    document.querySelectorAll('.hero-training-info span');
+
+  trainingInfo[0].innerHTML =
+    `<i class="fa-solid fa-clock"></i> ${t.time}`;
+
+  trainingInfo[1].innerHTML =
+    `<i class="fa-solid fa-brain"></i> ${t.decisions}`;
+
+  trainingInfo[2].innerHTML =
+    `<i class="fa-solid fa-shield-halved"></i> ${t.immunity}`;
+
+
+  // ESTADÍSTICAS
+
+  const stats =
+    document.querySelectorAll('.hero-stats .stat-card p');
+
+  stats[0].innerText = t.stages;
+  stats[1].innerText = t.languages;
+  stats[2].innerText = t.viralGoal;
+
+
+  // TABLERO
+
+  document.querySelector('.viral-card h3').innerHTML =
+    `<i class="fa-solid fa-biohazard"></i> ${t.viralTitle}`;
+
+  document.querySelector('.player-card h3').innerHTML =
+    `<i class="fa-solid fa-user-check"></i> ${t.profile}`;
+
+  document.querySelector('.spinner-card h3').innerHTML =
+    `<i class="fa-solid fa-dharmachakra"></i> ${t.wheel}`;
+
+  document.getElementById('spin-btn').innerText = t.spin;
+
+  document.querySelector('.board-wrapper h2').innerText =
+    t.boardTitle;
+
+
+  const stages =
+    document.querySelectorAll('.stage-label');
+
+  stages[0].innerText = t.morning;
+  stages[1].innerText = t.work;
+  stages[2].innerText = t.afternoon;
+  stages[3].innerText = t.night;
+
+
+  // BIFURCACIÓN
+
+  document.querySelector('.bifurcation-box h4').innerHTML =
+    `<i class="fa-solid fa-code-fork"></i> ${t.branchTitle}`;
+
+  const pathVerifier =
+    document.querySelector('.path-verifier');
+
+  pathVerifier.innerHTML =
+    `<strong>${t.verifier}</strong><br>
+     <small>${t.verifierDescription}</small>`;
+
+
+  const pathFast =
+    document.querySelector('.path-fast');
+
+  pathFast.innerHTML =
+    `<strong>${t.fast}</strong><br>
+     <small>${t.fastDescription}</small>`;
+
+
+  // LABORATORIO
+
+  document.querySelector('.lab-container h2').innerHTML =
+    `<i class="fa-solid fa-flask"></i> ${t.labTitle}`;
+
+  document.querySelector('.lab-container > p').innerText =
+    t.labDescription;
+
+  const labButtons =
+    document.querySelectorAll('.lab-buttons button');
+
+  labButtons[0].innerHTML =
+    `<i class="fa-solid fa-robot"></i> ${t.ai}`;
+
+  labButtons[1].innerHTML =
+    `<i class="fa-solid fa-link"></i> ${t.source}`;
+
+  labButtons[2].innerHTML =
+    `<i class="fa-solid fa-file-code"></i> ${t.metadata}`;
+
+  document.getElementById('lab-output').innerText =
+    t.labPlaceholder;
+
+
+  // RANKING
+
+  document.querySelector('.leaderboard-container h2').innerHTML =
+    `<i class="fa-solid fa-trophy"></i> ${t.rankingTitle}`;
+
+  const headers =
+    document.querySelectorAll('table th');
+
+  headers[0].innerText = t.position;
+  headers[1].innerText = t.agent;
+  headers[2].innerText = t.reliable;
+  headers[3].innerText = t.avoided;
+
+
+  // HUD
+
+  updateHUD();
+
+}
+
+
+// ==========================================
+// INICIAR ENTRENAMIENTO
+// ==========================================
+
+function startTraining() {
+
+  navigateTo('page-game');
+
+  setTimeout(() => {
+    openMinigame('clickbait');
+  }, 400);
+
+}
+
+
+// ==========================================
+// INICIALIZACIÓN
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  updateHUD();
+
+});
