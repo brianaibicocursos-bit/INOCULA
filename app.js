@@ -11,6 +11,8 @@ let viralLoad = 15;
 let followers = 100;
 let shields = 1;
 
+let currentNews = null;
+
 const fakeNews = [
   {
     headline: "🚨 ¡Tomar agua con limón elimina todas las toxinas del cuerpo!",
@@ -84,6 +86,25 @@ function openMinigame(type) {
   });
 
   if (type === 'clickbait') {
+
+    // Elegir una noticia al azar
+    const randomIndex = Math.floor(Math.random() * fakeNews.length);
+    const news = fakeNews[randomIndex];
+
+    // Guardar la noticia actual
+    currentNews = news;
+
+    // Mostrar la noticia
+    document.querySelector('#minigame-clickbait .headline').textContent =
+      news.headline;
+
+    document.getElementById('article-body').textContent =
+      news.article;
+
+    // Reiniciar el deslizador
+    document.getElementById('clickbait-slider').value = 50;
+
+    // Mostrar el minijuego
     document.getElementById('minigame-clickbait').classList.remove('hidden');
   }
 }
@@ -93,13 +114,29 @@ function toggleArticleBody() {
 
 function checkClickbait() {
   const val = document.getElementById('clickbait-slider').value;
-  if (val > 50) {
-    alert("¡Excelente! Detectaste que el titular exageraba la nota.");
-    followers += 25;
+
+  if (currentNews.exaggerated) {
+
+    if (val > 50) {
+      alert("¡Excelente! Detectaste que el titular exageraba la nota.");
+      followers += 25;
+    } else {
+      alert("¡Cuidado! El titular exageraba la información.");
+      viralLoad += 10;
+    }
+
   } else {
-    alert("Cagiste en el titular engañoso. Subió la Carga Viral.");
-    viralLoad += 10;
+
+    if (val <= 50) {
+      alert("¡Excelente! Detectaste que el titular representa correctamente la nota.");
+      followers += 25;
+    } else {
+      alert("¡Cuidado! El titular sí representaba correctamente la información.");
+      viralLoad += 10;
+    }
+
   }
+
   updateHUD();
   closeModal();
 }
