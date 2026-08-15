@@ -19,17 +19,61 @@ function spinWheel() {
     openMinigame('clickbait');
   }, 800);
 }
-
+const fakeNews = [
+  {
+    headline: "🚨 NOTICIA: ¡Este alimento destruye tu salud en segundos!",
+    source: "Publicado por @ViralNews_99 hace 5 minutos",
+    article: "Un estudio en 10 personas sugiere que el consumo excesivo de sal durante 30 años podría elevar ligeramente la presión arterial."
+  },
+  {
+    headline: "🚨 ÚLTIMA HORA: ¡Tomar agua fría causa enfermedades graves!",
+    source: "Publicado por @HealthFlash hace 12 minutos",
+    article: "No existe evidencia científica sólida de que beber agua fría por sí solo cause enfermedades graves."
+  },
+  {
+    headline: "🚨 VIRAL: ¡Las redes sociales pueden leer tus pensamientos!",
+    source: "Publicado por @TechSecrets hace 20 minutos",
+    article: "Las redes sociales pueden recopilar información sobre tus hábitos y preferencias, pero no existe evidencia de que puedan leer directamente tus pensamientos."
+  },
+  {
+    headline: "🚨 ALERTA: ¡Dormir con el celular cerca provoca pérdida inmediata de memoria!",
+    source: "Publicado por @InfoViral hace 8 minutos",
+    article: "El uso excesivo del celular puede afectar el sueño y la atención, pero no existe evidencia de una pérdida inmediata de memoria por dormir cerca del dispositivo."
+  },
+  {
+    headline: "🚨 DESCUBRIMIENTO: ¡Las imágenes satelitales son completamente falsas!",
+    source: "Publicado por @ViralNews_99 hace 3 minutos",
+    article: "Las imágenes satelitales son utilizadas ampliamente en investigación, meteorología, agricultura y navegación. Algunas imágenes pueden ser manipuladas o editadas, pero eso no significa que todas sean falsas."
+  }
+];
 function openMinigame(type) {
   const modal = document.getElementById('interactive-modal');
+
   modal.classList.remove('hidden');
-  document.querySelectorAll('.minigame-view').forEach(m => m.classList.add('hidden'));
+
+  document.querySelectorAll('.minigame-view').forEach(m => {
+    m.classList.add('hidden');
+  });
 
   if (type === 'clickbait') {
-    document.getElementById('minigame-clickbait').classList.remove('hidden');
+    const game = document.getElementById('minigame-clickbait');
+
+    const randomIndex = Math.floor(Math.random() * fakeNews.length);
+    const news = fakeNews[randomIndex];
+
+    game.querySelector('.headline').textContent = `"${news.headline}"`;
+    game.querySelector('.headline').dataset.article = news.article;
+
+    const articleBody = document.getElementById('article-body');
+    articleBody.textContent = news.article;
+    articleBody.classList.add('hidden');
+
+    const sourceText = game.querySelector('.fake-post p');
+    sourceText.textContent = news.source;
+
+    game.classList.remove('hidden');
   }
 }
-
 function toggleArticleBody() {
   document.getElementById('article-body').classList.toggle('hidden');
 }
