@@ -89,5 +89,42 @@ function closeModal() {
 }
 
 function changeLanguage(lang) {
-  alert(`Idioma cambiado a: ${lang.toUpperCase()}`);
+  const translations = {
+    es: {
+      inicio: "Inicio",
+      tablero: "Tablero",
+      laboratorio: "Laboratorio",
+      ranking: "Ranking"
+    },
+    en: {
+      inicio: "Home",
+      tablero: "Game Board",
+      laboratorio: "Laboratory",
+      ranking: "Leaderboard"
+    },
+    zh: {
+      inicio: "首页",
+      tablero: "游戏板",
+      laboratorio: "实验室",
+      ranking: "排行榜"
+    }
+  };
+
+  const t = translations[lang];
+
+  const navButtons = document.querySelectorAll(".nav-links .nav-btn");
+
+  if (navButtons.length >= 4) {
+    navButtons[0].innerHTML =
+      '<i class="fa-solid fa-house"></i> ' + t.inicio;
+
+    navButtons[1].innerHTML =
+      '<i class="fa-solid fa-gamepad"></i> ' + t.tablero;
+
+    navButtons[2].innerHTML =
+      '<i class="fa-solid fa-flask"></i> ' + t.laboratorio;
+
+    navButtons[3].innerHTML =
+      '<i class="fa-solid fa-trophy"></i> ' + t.ranking;
+  }
 }
